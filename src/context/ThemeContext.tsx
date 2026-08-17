@@ -15,6 +15,14 @@ export interface ThemeConfig {
 
 export const THEME_CONFIGS: ThemeConfig[] = [
   {
+    id: 'indigo',
+    name: 'Modern Indigo',
+    badge: '✨ Clean White UI',
+    previewBg: 'bg-blue-600',
+    previewPrimary: '#2563EB',
+    description: 'Clean, crisp white UI with professional royal blue accents.',
+  },
+  {
     id: 'dark-violet-sky',
     name: 'Dark Violet & Sky Blue',
     badge: '🌌 Cosmic Dark Glow',
@@ -46,14 +54,6 @@ export const THEME_CONFIGS: ThemeConfig[] = [
     previewPrimary: '#D97706',
     description: 'Warm amber filigree styling for high-honor award visual impact.',
   },
-  {
-    id: 'indigo',
-    name: 'Modern Indigo',
-    badge: '🌊 Clean Corporate',
-    previewBg: 'bg-blue-600',
-    previewPrimary: '#2563EB',
-    description: 'Clean, professional corporate design with rich blue accents.',
-  },
 ];
 
 interface ThemeContextType {
@@ -67,7 +67,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 const STORAGE_KEY = 'certifyhub:v1:app_theme';
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = useState<AppTheme>('dark-violet-sky');
+  const [theme, setThemeState] = useState<AppTheme>('indigo');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -78,7 +78,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setThemeState(saved);
         document.documentElement.setAttribute('data-theme', saved);
       } else {
-        document.documentElement.setAttribute('data-theme', 'dark-violet-sky');
+        document.documentElement.setAttribute('data-theme', 'indigo');
       }
     }
   }, []);
@@ -106,7 +106,7 @@ export function useTheme(): ThemeContextType {
   const context = useContext(ThemeContext);
   if (!context) {
     return {
-      theme: 'dark-violet-sky',
+      theme: 'indigo',
       setTheme: () => {},
       activeThemeConfig: THEME_CONFIGS[0],
     };

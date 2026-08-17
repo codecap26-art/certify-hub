@@ -31,7 +31,13 @@ export const ParticipantCategorySection: React.FC<ParticipantCategorySectionProp
   if (totalCount === 0) return null;
 
   return (
-    <div className="space-y-2 border border-slate-200/80 rounded-2xl p-2 bg-white shadow-2xs">
+    <div
+      className="space-y-2 border rounded-2xl p-2 shadow-2xs"
+      style={{
+        backgroundColor: 'var(--surface)',
+        borderColor: 'var(--border)',
+      }}
+    >
       <CategoryHeader
         categoryKey={categoryKey}
         displayTitle={displayTitle}

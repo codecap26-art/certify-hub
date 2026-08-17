@@ -224,12 +224,20 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
       />
 
       {/* Tabs Header */}
-      <div className="bg-white border border-slate-200 p-2 rounded-2xl flex items-center gap-2 shadow-xs">
+      <div
+        className="p-2 rounded-2xl flex items-center gap-2 border shadow-xs"
+        style={{
+          backgroundColor: 'var(--surface)',
+          borderColor: 'var(--border)',
+        }}
+      >
         <button
           onClick={() => setActiveTab('recipients')}
-          className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${
-            activeTab === 'recipients' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
-          }`}
+          className="flex-1 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2"
+          style={{
+            backgroundColor: activeTab === 'recipients' ? 'var(--primary)' : 'transparent',
+            color: activeTab === 'recipients' ? 'var(--text-inverse)' : 'var(--text-secondary)',
+          }}
         >
           <Users className="w-4 h-4" />
           <span>Participants Roster ({recipients.length})</span>
@@ -237,9 +245,11 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
 
         <button
           onClick={() => setActiveTab('certificates')}
-          className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${
-            activeTab === 'certificates' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
-          }`}
+          className="flex-1 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2"
+          style={{
+            backgroundColor: activeTab === 'certificates' ? 'var(--primary)' : 'transparent',
+            color: activeTab === 'certificates' ? 'var(--text-inverse)' : 'var(--text-secondary)',
+          }}
         >
           <FileCheck className="w-4 h-4" />
           <span>Issued Credentials ({certificates.length})</span>
@@ -263,16 +273,24 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
           {certificates.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {certificates.map((cert) => (
-                <div key={cert.id} className="bg-white border border-slate-200 p-4 rounded-2xl space-y-2 shadow-xs">
+                <div
+                  key={cert.id}
+                  className="p-4 rounded-2xl space-y-2 border shadow-xs"
+                  style={{
+                    backgroundColor: 'var(--surface)',
+                    borderColor: 'var(--border)',
+                  }}
+                >
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-bold text-blue-600">{cert.certificateCode}</span>
+                    <span className="font-mono text-xs font-bold" style={{ color: 'var(--primary)' }}>{cert.certificateCode}</span>
                     <StatusBadge status={cert.status} />
                   </div>
-                  <p className="font-bold text-slate-900 text-xs">{cert.recipientSnapshot.fullName}</p>
-                  <p className="text-[10px] text-slate-500">{cert.recipientSnapshot.email}</p>
+                  <p className="font-bold text-xs" style={{ color: 'var(--text-primary)' }}>{cert.recipientSnapshot.fullName}</p>
+                  <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{cert.recipientSnapshot.email}</p>
                   <Link
                     href={`/certificates/${cert.id}`}
-                    className="block text-right text-[11px] font-semibold text-teal-600 hover:underline pt-1"
+                    className="block text-right text-[11px] font-semibold hover:underline pt-1"
+                    style={{ color: 'var(--secondary)' }}
                   >
                     View Details →
                   </Link>
@@ -280,11 +298,18 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               ))}
             </div>
           ) : (
-            <div className="bg-white border border-slate-200 p-8 rounded-2xl text-center space-y-3 shadow-xs">
-              <p className="text-xs text-slate-600">No certificates generated for this event yet.</p>
+            <div
+              className="p-8 rounded-2xl text-center space-y-3 border shadow-xs"
+              style={{
+                backgroundColor: 'var(--surface)',
+                borderColor: 'var(--border)',
+              }}
+            >
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No certificates generated for this event yet.</p>
               <Link
                 href="/generate"
-                className="inline-flex items-center gap-2 bg-blue-600 text-white font-bold py-2 px-4 rounded-lg text-xs"
+                className="inline-flex items-center gap-2 text-white font-bold py-2 px-4 rounded-lg text-xs"
+                style={{ backgroundColor: 'var(--primary)' }}
               >
                 <Sparkles className="w-4 h-4" />
                 <span>Launch Generator Wizard</span>
@@ -296,18 +321,24 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
 
       {/* Manual Recipient Modal */}
       {showAddRecipientModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 p-6 rounded-2xl max-w-md w-full space-y-4 shadow-xl">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="text-base font-bold text-slate-900">Add Participant Manually</h3>
-              <button onClick={() => setShowAddRecipientModal(false)} className="text-slate-400 hover:text-slate-600">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div
+            className="p-6 rounded-2xl max-w-md w-full space-y-4 shadow-xl border"
+            style={{
+              backgroundColor: 'var(--surface-elevated)',
+              borderColor: 'var(--border-strong)',
+            }}
+          >
+            <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: 'var(--border-subtle)' }}>
+              <h3 className="text-base font-bold" style={{ color: 'var(--text-primary)' }}>Add Participant Manually</h3>
+              <button onClick={() => setShowAddRecipientModal(false)} className="text-slate-400 hover:text-slate-200">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleAddRecipient} className="space-y-4 text-xs">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1" htmlFor="rec-name">
+                <label className="block font-semibold mb-1" style={{ color: 'var(--text-secondary)' }} htmlFor="rec-name">
                   Full Name *
                 </label>
                 <input
@@ -316,17 +347,28 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                   required
                   value={newRecName}
                   onChange={(e) => setNewRecName(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-900 focus:outline-none focus:border-blue-500"
+                  className="w-full rounded-lg p-2.5 focus:outline-none border transition"
+                  style={{
+                    backgroundColor: 'var(--surface-subtle)',
+                    borderColor: 'var(--border)',
+                    color: 'var(--text-primary)',
+                  }}
                   placeholder="e.g. Subash P"
                 />
               </div>
 
               {/* Recipient Category / Achievement Question Box */}
-              <div className="space-y-1.5 bg-slate-50 border border-slate-200 p-3 rounded-xl">
-                <label className="block font-bold text-slate-800" htmlFor="rec-category">
+              <div
+                className="space-y-1.5 p-3 rounded-xl border"
+                style={{
+                  backgroundColor: 'var(--surface-subtle)',
+                  borderColor: 'var(--border-subtle)',
+                }}
+              >
+                <label className="block font-bold" style={{ color: 'var(--text-primary)' }} htmlFor="rec-category">
                   Participant Role / Status *
                 </label>
-                <p className="text-[11px] text-slate-500 mb-2">
+                <p className="text-[11px] mb-2" style={{ color: 'var(--text-muted)' }}>
                   Select whether this recipient is a Winner, Runner, or Participated:
                 </p>
 
@@ -334,11 +376,12 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                   <button
                     type="button"
                     onClick={() => setNewRecCategory('winner')}
-                    className={`p-2.5 rounded-xl border text-center font-bold text-xs transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
-                      newRecCategory === 'winner'
-                        ? 'bg-[#FFFBEB] border-[#FCD34D] text-[#92400E] ring-2 ring-[#FCD34D]/50 shadow-xs'
-                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
-                    }`}
+                    className="p-2.5 rounded-xl border text-center font-bold text-xs transition-all flex flex-col items-center justify-center gap-1 cursor-pointer"
+                    style={{
+                      backgroundColor: newRecCategory === 'winner' ? 'var(--warning-light)' : 'var(--surface)',
+                      borderColor: newRecCategory === 'winner' ? 'var(--warning-border)' : 'var(--border)',
+                      color: newRecCategory === 'winner' ? 'var(--warning-text)' : 'var(--text-secondary)',
+                    }}
                   >
                     <span className="text-base">🏆</span>
                     <span>Winner</span>
@@ -346,11 +389,12 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                   <button
                     type="button"
                     onClick={() => setNewRecCategory('runner')}
-                    className={`p-2.5 rounded-xl border text-center font-bold text-xs transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
-                      newRecCategory === 'runner'
-                        ? 'bg-[#F5F3FF] border-[#C4B5FD] text-[#5B21B6] ring-2 ring-[#C4B5FD]/50 shadow-xs'
-                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
-                    }`}
+                    className="p-2.5 rounded-xl border text-center font-bold text-xs transition-all flex flex-col items-center justify-center gap-1 cursor-pointer"
+                    style={{
+                      backgroundColor: newRecCategory === 'runner' ? 'var(--runner-soft)' : 'var(--surface)',
+                      borderColor: newRecCategory === 'runner' ? 'var(--runner-border)' : 'var(--border)',
+                      color: newRecCategory === 'runner' ? 'var(--runner-text)' : 'var(--text-secondary)',
+                    }}
                   >
                     <span className="text-base">🥈</span>
                     <span>Runner</span>
@@ -358,11 +402,12 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                   <button
                     type="button"
                     onClick={() => setNewRecCategory('participant')}
-                    className={`p-2.5 rounded-xl border text-center font-bold text-xs transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
-                      newRecCategory === 'participant'
-                        ? 'bg-[#ECFEFF] border-[#67E8F9] text-[#155E75] ring-2 ring-[#67E8F9]/50 shadow-xs'
-                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
-                    }`}
+                    className="p-2.5 rounded-xl border text-center font-bold text-xs transition-all flex flex-col items-center justify-center gap-1 cursor-pointer"
+                    style={{
+                      backgroundColor: newRecCategory === 'participant' ? 'var(--participant-soft)' : 'var(--surface)',
+                      borderColor: newRecCategory === 'participant' ? 'var(--participant-border)' : 'var(--border)',
+                      color: newRecCategory === 'participant' ? 'var(--participant-text)' : 'var(--text-secondary)',
+                    }}
                   >
                     <span className="text-base">📜</span>
                     <span>Participated</span>
@@ -373,7 +418,12 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                   id="rec-category"
                   value={newRecCategory}
                   onChange={(e) => setNewRecCategory(e.target.value as 'winner' | 'runner' | 'participant')}
-                  className="w-full bg-white border border-slate-200 rounded-lg p-2 text-slate-900 font-semibold focus:outline-none focus:border-blue-500 cursor-pointer"
+                  className="w-full rounded-lg p-2 font-semibold focus:outline-none border cursor-pointer transition"
+                  style={{
+                    backgroundColor: 'var(--surface)',
+                    borderColor: 'var(--border)',
+                    color: 'var(--text-primary)',
+                  }}
                 >
                   <option value="winner">Winner</option>
                   <option value="runner">Runner</option>
@@ -382,7 +432,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1" htmlFor="rec-email">
+                <label className="block font-semibold mb-1" style={{ color: 'var(--text-secondary)' }} htmlFor="rec-email">
                   Email Address
                 </label>
                 <input
@@ -390,14 +440,19 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                   type="email"
                   value={newRecEmail}
                   onChange={(e) => setNewRecEmail(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-900 focus:outline-none focus:border-blue-500"
+                  className="w-full rounded-lg p-2.5 focus:outline-none border transition"
+                  style={{
+                    backgroundColor: 'var(--surface-subtle)',
+                    borderColor: 'var(--border)',
+                    color: 'var(--text-primary)',
+                  }}
                   placeholder="subash@example.com"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1" htmlFor="rec-reg">
+                  <label className="block font-semibold mb-1" style={{ color: 'var(--text-secondary)' }} htmlFor="rec-reg">
                     Reg / Roll Number
                   </label>
                   <input
@@ -405,13 +460,18 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                     type="text"
                     value={newRecRegNum}
                     onChange={(e) => setNewRecRegNum(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-900 focus:outline-none focus:border-blue-500"
+                    className="w-full rounded-lg p-2.5 focus:outline-none border transition"
+                    style={{
+                      backgroundColor: 'var(--surface-subtle)',
+                      borderColor: 'var(--border)',
+                      color: 'var(--text-primary)',
+                    }}
                     placeholder="23CS101"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1" htmlFor="rec-dept">
+                  <label className="block font-semibold mb-1" style={{ color: 'var(--text-secondary)' }} htmlFor="rec-dept">
                     Department
                   </label>
                   <input
@@ -419,7 +479,12 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                     type="text"
                     value={newRecDept}
                     onChange={(e) => setNewRecDept(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-900 focus:outline-none focus:border-blue-500"
+                    className="w-full rounded-lg p-2.5 focus:outline-none border transition"
+                    style={{
+                      backgroundColor: 'var(--surface-subtle)',
+                      borderColor: 'var(--border)',
+                      color: 'var(--text-primary)',
+                    }}
                     placeholder="CSE"
                   />
                 </div>
@@ -429,11 +494,20 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                 <button
                   type="button"
                   onClick={() => setShowAddRecipientModal(false)}
-                  className="px-4 py-2 rounded-lg font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200"
+                  className="px-4 py-2 rounded-lg font-semibold border transition"
+                  style={{
+                    backgroundColor: 'var(--surface-subtle)',
+                    borderColor: 'var(--border)',
+                    color: 'var(--text-secondary)',
+                  }}
                 >
                   Cancel
                 </button>
-                <button type="submit" className="px-4 py-2 rounded-lg font-bold bg-blue-600 text-white hover:bg-blue-700">
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-lg font-bold text-white shadow-xs transition"
+                  style={{ backgroundColor: 'var(--primary)' }}
+                >
                   Save Recipient
                 </button>
               </div>
@@ -444,25 +518,38 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
 
       {/* CSV Import Modal */}
       {showCsvModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 p-6 rounded-2xl max-w-lg w-full space-y-4 shadow-xl">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <FileSpreadsheet className="w-5 h-5 text-teal-600" />
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div
+            className="p-6 rounded-2xl max-w-lg w-full space-y-4 shadow-xl border"
+            style={{
+              backgroundColor: 'var(--surface-elevated)',
+              borderColor: 'var(--border-strong)',
+            }}
+          >
+            <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: 'var(--border-subtle)' }}>
+              <h3 className="text-base font-bold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+                <FileSpreadsheet className="w-5 h-5" style={{ color: 'var(--secondary)' }} />
                 <span>Import Recipients CSV Roster</span>
               </h3>
-              <button onClick={() => setShowCsvModal(false)} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => setShowCsvModal(false)} className="text-slate-400 hover:text-slate-200">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-4 text-xs">
-              <div className="flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-200">
-                <span className="text-slate-600">Need sample CSV template format?</span>
+              <div
+                className="flex items-center justify-between p-3 rounded-lg border"
+                style={{
+                  backgroundColor: 'var(--surface-subtle)',
+                  borderColor: 'var(--border-subtle)',
+                }}
+              >
+                <span style={{ color: 'var(--text-secondary)' }}>Need sample CSV template format?</span>
                 <a
                   href={`data:text/csv;charset=utf-8,${encodeURIComponent(generateSampleCSV())}`}
                   download="Sample_Recipients_Import.csv"
-                  className="text-teal-700 hover:underline font-bold flex items-center gap-1"
+                  className="hover:underline font-bold flex items-center gap-1"
+                  style={{ color: 'var(--secondary)' }}
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>Download Sample CSV</span>
@@ -470,28 +557,39 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-2">Upload CSV File *</label>
+                <label className="block font-semibold mb-2" style={{ color: 'var(--text-secondary)' }}>Upload CSV File *</label>
                 <input
                   type="file"
                   accept=".csv"
                   onChange={handleCsvFileChange}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800"
+                  className="w-full rounded-lg p-2.5 border transition"
+                  style={{
+                    backgroundColor: 'var(--surface-subtle)',
+                    borderColor: 'var(--border)',
+                    color: 'var(--text-primary)',
+                  }}
                 />
               </div>
 
               {csvPreview && (
-                <div className="bg-slate-50 border border-slate-200 p-4 rounded-lg space-y-2 text-xs">
-                  <p className="font-bold text-slate-900">PapaParse CSV Validation Summary:</p>
+                <div
+                  className="p-4 rounded-lg space-y-2 text-xs border"
+                  style={{
+                    backgroundColor: 'var(--surface-subtle)',
+                    borderColor: 'var(--border-subtle)',
+                  }}
+                >
+                  <p className="font-bold" style={{ color: 'var(--text-primary)' }}>PapaParse CSV Validation Summary:</p>
                   <div className="grid grid-cols-3 gap-2 text-center pt-1">
-                    <div className="p-2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <div className="p-2 rounded bg-emerald-950/40 text-emerald-300 border border-emerald-800/60">
                       <p className="font-bold text-base">{csvPreview.valid.length}</p>
                       <p className="text-[10px]">Valid Rows</p>
                     </div>
-                    <div className="p-2 rounded bg-amber-50 text-amber-700 border border-amber-200">
+                    <div className="p-2 rounded bg-amber-950/40 text-amber-300 border border-amber-800/60">
                       <p className="font-bold text-base">{csvPreview.duplicates}</p>
                       <p className="text-[10px]">Duplicates</p>
                     </div>
-                    <div className="p-2 rounded bg-red-50 text-red-700 border border-red-200">
+                    <div className="p-2 rounded bg-red-950/40 text-red-300 border border-red-800/60">
                       <p className="font-bold text-base">{csvPreview.invalid}</p>
                       <p className="text-[10px]">Invalid</p>
                     </div>

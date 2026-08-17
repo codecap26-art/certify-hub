@@ -9,26 +9,30 @@ const STORAGE_KEY = 'custom_templates';
 export const templateRepository = {
   getAll(): CustomTemplate[] {
     const custom = getItem<CustomTemplate[]>(STORAGE_KEY, []);
-    // Combine built-in templates with custom templates
-    const customIds = new Set(custom.map((t) => t.id));
-    const uniqueBuiltIns = BUILT_IN_TEMPLATES.filter((t) => !customIds.has(t.id));
-    return [...uniqueBuiltIns, ...custom];
+    const builtInIds = new Set(BUILT_IN_TEMPLATES.map((t) => t.id));
+    // Filter out any stale built-ins saved to custom storage
+    const userCustomOnly = custom.filter((t) => !builtInIds.has(t.id) && !t.isBuiltIn);
+    return [...BUILT_IN_TEMPLATES, ...userCustomOnly];
   },
 
   async getById(id: string): Promise<CustomTemplate | null> {
-    const list = this.getAll();
-    let t = list.find((item) => item.id === id);
+    // 1. Direct match in canonical built-ins first
+    let t = BUILT_IN_TEMPLATES.find((item) => item.id === id);
+    if (!t) {
+      const list = this.getAll();
+      t = list.find((item) => item.id === id);
+    }
 
     // Fallback for legacy template string IDs to corresponding built-in templates
     if (!t) {
       if (id === 'modern-blue') {
-        t = list.find((item) => item.id === 'tmpl-institutional-appreciation');
+        t = BUILT_IN_TEMPLATES.find((item) => item.id === 'tmpl-institutional-appreciation');
       } else if (id === 'classic-gold') {
-        t = list.find((item) => item.id === 'tmpl-competition-winner');
+        t = BUILT_IN_TEMPLATES.find((item) => item.id === 'tmpl-competition-winner');
       } else if (id === 'minimal-green') {
-        t = list.find((item) => item.id === 'tmpl-academic-participation');
+        t = BUILT_IN_TEMPLATES.find((item) => item.id === 'tmpl-academic-participation');
       } else if (id === 'academic-maroon') {
-        t = list.find((item) => item.id === 'tmpl-training-completion');
+        t = BUILT_IN_TEMPLATES.find((item) => item.id === 'tmpl-training-completion');
       }
     }
 
