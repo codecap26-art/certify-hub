@@ -15,7 +15,7 @@ interface UploadedAsset {
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 export const UploadsPanel: React.FC = () => {
-  const { addImage, dispatch } = useEditor();
+  const { addImage, addLogo, addSignature, dispatch } = useEditor();
   const [assets, setAssets] = useState<UploadedAsset[]>([]);
   const [search, setSearch] = useState('');
   const [isDragging, setIsDragging] = useState(false);
@@ -81,7 +81,7 @@ export const UploadsPanel: React.FC = () => {
       <div className="flex-1 overflow-y-auto p-3 space-y-3">
         {/* Drop zone */}
         <label
-          className={`block w-full p-6 border-2 border-dashed rounded-xl text-center cursor-pointer transition ${
+          className={`block w-full p-5 border-2 border-dashed rounded-xl text-center cursor-pointer transition ${
             isDragging
               ? 'border-blue-400 bg-blue-50'
               : 'border-slate-300 hover:border-blue-400 hover:bg-slate-50'
@@ -90,11 +90,11 @@ export const UploadsPanel: React.FC = () => {
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
         >
-          <Upload className="w-6 h-6 text-blue-500 mx-auto mb-2" />
+          <Upload className="w-5 h-5 text-blue-500 mx-auto mb-1.5" />
           <span className="block text-xs font-bold text-slate-700">
-            {isDragging ? 'Drop files here' : 'Drag & drop or browse'}
+            {isDragging ? 'Drop images here' : 'Drag & drop or browse'}
           </span>
-          <span className="block text-[9px] text-slate-400 mt-1">PNG, JPG, WebP · Max 10MB</span>
+          <span className="block text-[9px] text-slate-400 mt-0.5">PNG, JPG, WebP, SVG · Max 10MB</span>
           <input
             type="file"
             accept="image/png, image/jpeg, image/webp, image/svg+xml"
@@ -103,6 +103,52 @@ export const UploadsPanel: React.FC = () => {
             className="hidden"
           />
         </label>
+
+        {/* Dedicated Quick Add Shortcuts */}
+        <div>
+          <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Element Shortcuts</h4>
+          <div className="grid grid-cols-2 gap-1.5 text-xs">
+            <button
+              onClick={() => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/png, image/jpeg, image/webp, image/svg+xml';
+                input.onchange = (e) => {
+                  const file = (e.target as HTMLInputElement).files?.[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = () => addLogo(reader.result as string);
+                  reader.readAsDataURL(file);
+                };
+                input.click();
+              }}
+              className="p-2 bg-slate-50 border border-slate-200 rounded-lg text-left hover:border-blue-400 hover:bg-blue-50/40 transition flex items-center gap-1.5 font-bold text-slate-700"
+            >
+              <PenLine className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+              <span>Add Logo</span>
+            </button>
+
+            <button
+              onClick={() => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/png, image/jpeg, image/webp, image/svg+xml';
+                input.onchange = (e) => {
+                  const file = (e.target as HTMLInputElement).files?.[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = () => addSignature(reader.result as string);
+                  reader.readAsDataURL(file);
+                };
+                input.click();
+              }}
+              className="p-2 bg-slate-50 border border-slate-200 rounded-lg text-left hover:border-blue-400 hover:bg-blue-50/40 transition flex items-center gap-1.5 font-bold text-slate-700"
+            >
+              <PenLine className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span>Add Signature</span>
+            </button>
+          </div>
+        </div>
 
         {/* Asset grid */}
         {filtered.length > 0 && (

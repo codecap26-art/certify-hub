@@ -16,6 +16,9 @@ import {
   Search,
   Check,
   Building2,
+  Edit3,
+  ExternalLink,
+  Palette,
 } from 'lucide-react';
 import { eventRepository } from '@/lib/storage/eventRepository';
 import { recipientRepository } from '@/lib/storage/recipientRepository';
@@ -25,13 +28,23 @@ import { templateRepository } from '@/lib/storage/templateRepository';
 import { EventItem, Recipient, TemplateId, CertificateRecord } from '@/types';
 import { CustomTemplate } from '@/types/template';
 import { TEMPLATES } from '@/lib/constants';
+import { BUILT_IN_TEMPLATES } from '@/lib/template/builtInTemplates';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { CertificateRenderer } from '@/components/templates/CertificateRenderer';
+import { ParticipantSelection } from '@/components/generator/ParticipantSelection';
+import { getNormalizedCategory } from '@/lib/participantUtils';
 import {
   generateCertificateCode,
   generateVerificationToken,
 } from '@/lib/certificate/codeGenerator';
 import { generateAndDownloadBulkCertificatesZip } from '@/lib/certificate/bulkGenerator';
+import {
+  DEFAULT_CATEGORY_TEMPLATE_MAPPING,
+  CategoryTemplateMapping,
+  resolveTemplateIdForCategory,
+  getCategoryDefaultTemplateId,
+  getCategoryRoleBadge,
+} from '@/lib/template/categoryTemplateUtils';
 
 const STEPS = [
   { id: 1, name: 'Select Event', icon: Calendar },
@@ -56,6 +69,10 @@ export default function CertificateGeneratorWizard() {
   const [selectedRecipientIds, setSelectedRecipientIds] = useState<string[]>([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('modern-blue');
   const [recipientSearch, setRecipientSearch] = useState('');
+  const [autoMapCategories, setAutoMapCategories] = useState(true);
+  const [categoryMappings, setCategoryMappings] = useState<CategoryTemplateMapping>(
+    DEFAULT_CATEGORY_TEMPLATE_MAPPING
+  );
 
   // Generated State
   const [isGenerating, setIsGenerating] = useState(false);
@@ -68,7 +85,18 @@ export default function CertificateGeneratorWizard() {
   useEffect(() => {
     const allEvents = eventRepository.getAll();
     setEvents(allEvents);
-    setCustomTemplatesList(templateRepository.getAll());
+    const customList = templateRepository.getAll();
+    setCustomTemplatesList(customList);
+
+    // Initialize smart default template mapping
+    const winnerDef = getCategoryDefaultTemplateId('winner', customList);
+    const runnerDef = getCategoryDefaultTemplateId('runner', customList);
+    const participantDef = getCategoryDefaultTemplateId('participant', customList);
+    setCategoryMappings({
+      winner: winnerDef,
+      runner: runnerDef,
+      participant: participantDef,
+    });
 
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -92,8 +120,12 @@ export default function CertificateGeneratorWizard() {
   useEffect(() => {
     if (selectedEventId) {
       const recs = recipientRepository.getByEventId(selectedEventId);
-      setRecipients(recs);
-      setSelectedRecipientIds(recs.map((r) => r.id));
+      const normalizedRecs = recs.map((r) => ({
+        ...r,
+        category: getNormalizedCategory(r),
+      }));
+      setRecipients(normalizedRecs);
+      setSelectedRecipientIds(normalizedRecs.map((r) => r.id));
     }
   }, [selectedEventId]);
 
@@ -115,12 +147,21 @@ export default function CertificateGeneratorWizard() {
     }
   };
 
+  const [previewRecipientId, setPreviewRecipientId] = useState<string>('');
+
   // Preview Certificate Snapshot
+  const activePreviewRecipient =
+    selectedRecipients.find((r) => r.id === previewRecipientId) || selectedRecipients[0];
+  const previewCategory = activePreviewRecipient?.category || 'participant';
+  const previewTemplateId = autoMapCategories
+    ? resolveTemplateIdForCategory(previewCategory, categoryMappings, customTemplatesList)
+    : selectedTemplateId;
+
   const previewCertificateSnapshot: Partial<CertificateRecord> = {
     certificateCode: 'PREVIEW-CODE-2026',
     verificationToken: 'preview-token-demo',
     eventId: selectedEventId,
-    templateId: (selectedTemplateId as TemplateId) || 'modern-blue',
+    templateId: (previewTemplateId as TemplateId) || 'modern-blue',
     organizationSnapshot: org,
     eventSnapshot: selectedEvent || {
       id: 'demo-evt',
@@ -136,7 +177,7 @@ export default function CertificateGeneratorWizard() {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     },
-    recipientSnapshot: selectedRecipients[0] || {
+    recipientSnapshot: activePreviewRecipient || {
       id: 'demo-rec',
       eventId: selectedEventId,
       fullName: 'Sample Participant',
@@ -144,6 +185,8 @@ export default function CertificateGeneratorWizard() {
       registrationNumber: '2026-REG-01',
       department: 'Computer Science',
       course: 'React & Next.js Workshop',
+      category: 'participant',
+      achievement: 'Participant',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     },
@@ -163,6 +206,10 @@ export default function CertificateGeneratorWizard() {
       const rec = selectedRecipients[i];
       const code = generateCertificateCode(org.name, selectedEvent.name);
       const token = generateVerificationToken();
+      const recCategory = getNormalizedCategory(rec);
+      const recTemplateId = autoMapCategories
+        ? resolveTemplateIdForCategory(recCategory, categoryMappings, customTemplatesList)
+        : selectedTemplateId;
 
       const record: CertificateRecord = {
         id: `cert-${Date.now()}-${i}-${Math.random().toString(36).substring(2, 6)}`,
@@ -170,7 +217,7 @@ export default function CertificateGeneratorWizard() {
         verificationToken: token,
         eventId: selectedEvent.id,
         recipientId: rec.id,
-        templateId: selectedTemplateId,
+        templateId: recTemplateId,
         organizationSnapshot: {
           ...org,
           logoDataUrl: '',
@@ -214,7 +261,7 @@ export default function CertificateGeneratorWizard() {
       />
 
       {/* Horizontal Desktop / Scrollable Stepper Navigation */}
-      <div className="bg-white border border-slate-200 p-4 rounded-2xl overflow-x-auto shadow-xs">
+      <div className="bg-[#FFFFFF] border border-[#E2E8F0] p-4 rounded-2xl overflow-x-auto shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
         <div className="flex items-center justify-between min-w-[640px] px-2">
           {STEPS.map((step, idx) => {
             const isCompleted = currentStep > step.id;
@@ -224,28 +271,30 @@ export default function CertificateGeneratorWizard() {
               <React.Fragment key={step.id}>
                 <div
                   onClick={() => isCompleted && setCurrentStep(step.id)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-xl transition cursor-pointer ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200 cursor-pointer ${
                     isActive
-                      ? 'bg-blue-50 border border-blue-200 text-blue-700 font-bold'
+                      ? 'bg-[#EFF6FF] border border-[#93C5FD] text-[#2563EB] font-bold shadow-[0_1px_4px_rgba(37,99,235,0.12)]'
                       : isCompleted
-                      ? 'text-teal-700 font-semibold hover:bg-slate-50'
-                      : 'text-slate-400 opacity-60'
+                      ? 'text-[#06B6D4] font-semibold hover:bg-[#F8FAFC]'
+                      : 'text-[#94A3B8] opacity-75'
                   }`}
                 >
                   <div
-                    className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs ${
+                    className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs transition-all duration-200 ${
                       isActive
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-[#2563EB] text-white shadow-[0_2px_8px_rgba(37,99,235,0.25)] ring-2 ring-[#2563EB]/25 font-bold'
                         : isCompleted
-                        ? 'bg-teal-100 text-teal-700'
-                        : 'bg-slate-100 text-slate-500'
+                        ? 'bg-[#ECFEFF] text-[#06B6D4] border border-[#67E8F9] font-bold'
+                        : 'bg-[#F1F5F9] text-[#94A3B8]'
                     }`}
                   >
-                    {isCompleted ? <Check className="w-4 h-4" /> : step.id}
+                    {isCompleted ? <Check className="w-4 h-4 stroke-[3]" /> : step.id}
                   </div>
                   <span className="text-xs whitespace-nowrap">{step.name}</span>
                 </div>
-                {idx < STEPS.length - 1 && <div className="h-[1px] w-6 bg-slate-200 shrink-0" />}
+                {idx < STEPS.length - 1 && (
+                  <div className={`h-[1px] w-6 shrink-0 transition-colors duration-200 ${isCompleted ? 'bg-[#67E8F9]' : 'bg-[#E2E8F0]'}`} />
+                )}
               </React.Fragment>
             );
           })}
@@ -311,152 +360,323 @@ export default function CertificateGeneratorWizard() {
           {/* STEP 2: SELECT RECIPIENTS */}
           {currentStep === 2 && (
             <div className="bg-white border border-slate-200 p-6 rounded-2xl space-y-6 shadow-xs">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-                <div>
-                  <h2 className="text-base font-bold text-slate-900">Step 2: Select Participants ({selectedRecipientIds.length} Selected)</h2>
-                  <p className="text-xs text-slate-600 mt-0.5">
-                    Filter or toggle participant selection for event: <strong>{selectedEvent?.name}</strong>
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={toggleSelectAll}
-                    className="text-xs font-semibold text-blue-700 hover:bg-blue-100 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200"
-                  >
-                    {selectedRecipientIds.length === recipients.length ? 'Deselect All' : 'Select All'}
-                  </button>
-                </div>
-              </div>
-
-              <div className="relative">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={recipientSearch}
-                  onChange={(e) => setRecipientSearch(e.target.value)}
-                  placeholder="Search participant name, email, or registration number..."
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-xs text-slate-800 focus:outline-none focus:border-blue-500"
-                />
-              </div>
-
-              {recipients.length > 0 ? (
-                <div className="max-h-80 overflow-y-auto space-y-2 pr-1">
-                  {recipients
-                    .filter((r) =>
-                      r.fullName.toLowerCase().includes(recipientSearch.toLowerCase()) ||
-                      (r.email || '').toLowerCase().includes(recipientSearch.toLowerCase())
-                    )
-                    .map((rec) => {
-                      const isChecked = selectedRecipientIds.includes(rec.id);
-                      return (
-                        <div
-                          key={rec.id}
-                          onClick={() => toggleRecipient(rec.id)}
-                          className={`p-3 rounded-xl border cursor-pointer flex items-center justify-between transition ${
-                            isChecked
-                              ? 'bg-blue-50/80 border-blue-500 text-slate-900'
-                              : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <input
-                              type="checkbox"
-                              checked={isChecked}
-                              onChange={() => {}}
-                              className="rounded border-slate-300 text-blue-600"
-                            />
-                            <div>
-                              <p className="font-bold text-xs text-slate-900">{rec.fullName}</p>
-                              <p className="text-[10px] text-slate-500">{rec.email} • {rec.department || 'N/A'}</p>
-                            </div>
-                          </div>
-
-                          <span className="text-[11px] font-mono text-slate-600">{rec.registrationNumber}</span>
-                        </div>
-                      );
-                    })}
-                </div>
-              ) : (
-                <p className="text-xs text-slate-500 text-center py-8">
-                  No recipients found for this event. Please add or import recipients first.
-                </p>
-              )}
+              <ParticipantSelection
+                eventName={selectedEvent?.name}
+                recipients={recipients}
+                selectedRecipientIds={selectedRecipientIds}
+                onSelectionChange={(selectedIds) => setSelectedRecipientIds(selectedIds)}
+                onUpdateRecipient={(updatedRec) => {
+                  setRecipients((prev) =>
+                    prev.map((r) => (r.id === updatedRec.id ? updatedRec : r))
+                  );
+                  recipientRepository.save(updatedRec);
+                }}
+              />
             </div>
           )}
 
           {/* STEP 3: SELECT TEMPLATE */}
           {currentStep === 3 && (
             <div className="bg-white border border-slate-200 p-6 rounded-2xl space-y-6 shadow-xs">
-              <div>
-                <h2 className="text-base font-bold text-slate-900">Step 3: Select Built-in or Custom Template</h2>
-                <p className="text-xs text-slate-600 mt-1">
-                  Pick from built-in vector themes or your custom canvas designs.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <h3 className="font-bold text-xs text-slate-700 uppercase tracking-wider">Built-in Themes</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {TEMPLATES.map((tmpl) => (
-                    <div
-                      key={tmpl.id}
-                      onClick={() => setSelectedTemplateId(tmpl.id)}
-                      className={`p-4 rounded-2xl border cursor-pointer transition space-y-3 ${
-                        selectedTemplateId === tmpl.id
-                          ? 'bg-blue-50/80 border-blue-500 text-slate-900 shadow-xs ring-2 ring-blue-500/20'
-                          : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300'
-                      }`}
-                    >
-                      <div
-                        className="h-24 rounded-xl flex items-center justify-center font-bold text-xs shadow-inner"
-                        style={{ backgroundColor: tmpl.theme.cardBg, color: tmpl.theme.primary }}
-                      >
-                        {tmpl.name}
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-xs text-slate-900">{tmpl.name}</h4>
-                        <p className="text-[11px] text-slate-600 line-clamp-1 mt-0.5">{tmpl.description}</p>
-                      </div>
-                    </div>
-                  ))}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                  <h2 className="text-base font-bold text-slate-900">Step 3: Certificate Template Assignment</h2>
+                  <p className="text-xs text-slate-600 mt-1">
+                    Automatically match templates for Winner 🏆, Runner 🥈, and Participated 📜, or choose a single template for all.
+                  </p>
                 </div>
 
-                {customTemplatesList.length > 0 && (
-                  <div className="space-y-3 border-t border-slate-100 pt-4">
-                    <h3 className="font-bold text-xs text-slate-700 uppercase tracking-wider">Custom & Imported Templates</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {customTemplatesList.map((tmpl) => (
-                        <div
-                          key={tmpl.id}
-                          onClick={() => setSelectedTemplateId(tmpl.id)}
-                          className={`p-4 rounded-2xl border cursor-pointer transition space-y-2 ${
-                            selectedTemplateId === tmpl.id
-                              ? 'bg-blue-50/80 border-blue-500 text-slate-900 shadow-xs ring-2 ring-blue-500/20'
-                              : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded">
-                              {tmpl.category}
-                            </span>
-                            {selectedTemplateId === tmpl.id ? (
-                              <span className="flex items-center gap-1 text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full border border-blue-300">
-                                <Check className="w-3 h-3" /> Selected
-                              </span>
-                            ) : (
-                              <span className="text-[10px] text-slate-400 font-mono">{tmpl.orientation}</span>
-                            )}
-                          </div>
-                          <h4 className="font-bold text-xs text-slate-900">{tmpl.name}</h4>
-                          <p className="text-[11px] text-slate-500 line-clamp-1">{tmpl.description}</p>
+                {/* Mode Selector Toggle */}
+                <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setAutoMapCategories(true)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      autoMapCategories
+                        ? 'bg-blue-600 text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Auto-Map Roles ⚡
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAutoMapCategories(false)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      !autoMapCategories
+                        ? 'bg-blue-600 text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Single Template
+                  </button>
+                </div>
+              </div>
+
+              {autoMapCategories ? (
+                /* Category Auto-Mapping UI */
+                <div className="space-y-6">
+                  <div className="bg-blue-50/70 border border-blue-200 rounded-xl p-3 text-xs text-blue-900 flex items-center justify-between">
+                    <span className="font-semibold">
+                      ⚡ Templates will be updated automatically for each participant based on their category (Winner, Runner, Participated).
+                    </span>
+                    <span className="font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded border border-blue-300">
+                      Auto-Mapping Active
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Winner Template Selection Card */}
+                    <div className="bg-[#FFFBEB] border border-[#FCD34D] rounded-2xl p-4 space-y-3 shadow-xs flex flex-col justify-between">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-xs text-[#92400E] flex items-center gap-1.5">
+                            <span className="text-base">🏆</span> Winner Template
+                          </span>
+                          <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded">
+                            {selectedRecipients.filter((r) => getNormalizedCategory(r) === 'winner').length} Recipients
+                          </span>
                         </div>
-                      ))}
+                        <select
+                          value={categoryMappings.winner}
+                          onChange={(e) => setCategoryMappings((prev) => ({ ...prev, winner: e.target.value }))}
+                          className="w-full p-2 bg-white border border-amber-300 rounded-xl font-bold text-xs text-slate-800 focus:ring-2 focus:ring-amber-500/50 cursor-pointer"
+                        >
+                          <optgroup label="Built-in Specialized Templates">
+                            {BUILT_IN_TEMPLATES.map((t) => (
+                              <option key={t.id} value={t.id}>
+                                {t.name} ({t.orientation})
+                              </option>
+                            ))}
+                          </optgroup>
+                          <optgroup label="Built-in Themes">
+                            {TEMPLATES.map((t) => (
+                              <option key={t.id} value={t.id}>{t.name} Theme</option>
+                            ))}
+                          </optgroup>
+                          {customTemplatesList.length > 0 && (
+                            <optgroup label="Custom & Saved Designs">
+                              {customTemplatesList.map((t) => (
+                                <option key={t.id} value={t.id}>{t.name}</option>
+                              ))}
+                            </optgroup>
+                          )}
+                        </select>
+                        <p className="text-[11px] text-amber-800/80">
+                          Assigned to 1st Place & Winner category certificate generation.
+                        </p>
+                      </div>
+                      <Link
+                        href={`/studio/editor/${categoryMappings.winner}?from=generate&eventId=${selectedEventId}`}
+                        className="mt-2 w-full flex items-center justify-center gap-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold text-xs py-2 px-3 rounded-xl transition"
+                      >
+                        <Edit3 className="w-3.5 h-3.5 text-amber-700" />
+                        <span>Customize Winner Template</span>
+                      </Link>
+                    </div>
+
+                    {/* Runner Template Selection Card */}
+                    <div className="bg-[#F5F3FF] border border-[#C4B5FD] rounded-2xl p-4 space-y-3 shadow-xs flex flex-col justify-between">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-xs text-[#5B21B6] flex items-center gap-1.5">
+                            <span className="text-base">🥈</span> Runner Template
+                          </span>
+                          <span className="text-[10px] font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded">
+                            {selectedRecipients.filter((r) => getNormalizedCategory(r) === 'runner').length} Recipients
+                          </span>
+                        </div>
+                        <select
+                          value={categoryMappings.runner}
+                          onChange={(e) => setCategoryMappings((prev) => ({ ...prev, runner: e.target.value }))}
+                          className="w-full p-2 bg-white border border-purple-300 rounded-xl font-bold text-xs text-slate-800 focus:ring-2 focus:ring-purple-500/50 cursor-pointer"
+                        >
+                          <optgroup label="Built-in Specialized Templates">
+                            {BUILT_IN_TEMPLATES.map((t) => (
+                              <option key={t.id} value={t.id}>
+                                {t.name} ({t.orientation})
+                              </option>
+                            ))}
+                          </optgroup>
+                          <optgroup label="Built-in Themes">
+                            {TEMPLATES.map((t) => (
+                              <option key={t.id} value={t.id}>{t.name} Theme</option>
+                            ))}
+                          </optgroup>
+                          {customTemplatesList.length > 0 && (
+                            <optgroup label="Custom & Saved Designs">
+                              {customTemplatesList.map((t) => (
+                                <option key={t.id} value={t.id}>{t.name}</option>
+                              ))}
+                            </optgroup>
+                          )}
+                        </select>
+                        <p className="text-[11px] text-purple-800/80">
+                          Assigned to 2nd/3rd Place & Runner-up certificate generation.
+                        </p>
+                      </div>
+                      <Link
+                        href={`/studio/editor/${categoryMappings.runner}?from=generate&eventId=${selectedEventId}`}
+                        className="mt-2 w-full flex items-center justify-center gap-1.5 bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-300 font-bold text-xs py-2 px-3 rounded-xl transition"
+                      >
+                        <Edit3 className="w-3.5 h-3.5 text-purple-700" />
+                        <span>Customize Runner Template</span>
+                      </Link>
+                    </div>
+
+                    {/* Participated Template Selection Card */}
+                    <div className="bg-[#ECFEFF] border border-[#67E8F9] rounded-2xl p-4 space-y-3 shadow-xs flex flex-col justify-between">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-xs text-[#155E75] flex items-center gap-1.5">
+                            <span className="text-base">📜</span> Participated Template
+                          </span>
+                          <span className="text-[10px] font-bold text-cyan-700 bg-cyan-100 px-2 py-0.5 rounded">
+                            {selectedRecipients.filter((r) => getNormalizedCategory(r) === 'participant').length} Recipients
+                          </span>
+                        </div>
+                        <select
+                          value={categoryMappings.participant}
+                          onChange={(e) => setCategoryMappings((prev) => ({ ...prev, participant: e.target.value }))}
+                          className="w-full p-2 bg-white border border-cyan-300 rounded-xl font-bold text-xs text-slate-800 focus:ring-2 focus:ring-cyan-500/50 cursor-pointer"
+                        >
+                          <optgroup label="Built-in Specialized Templates">
+                            {BUILT_IN_TEMPLATES.map((t) => (
+                              <option key={t.id} value={t.id}>
+                                {t.name} ({t.orientation})
+                              </option>
+                            ))}
+                          </optgroup>
+                          <optgroup label="Built-in Themes">
+                            {TEMPLATES.map((t) => (
+                              <option key={t.id} value={t.id}>{t.name} Theme</option>
+                            ))}
+                          </optgroup>
+                          {customTemplatesList.length > 0 && (
+                            <optgroup label="Custom & Saved Designs">
+                              {customTemplatesList.map((t) => (
+                                <option key={t.id} value={t.id}>{t.name}</option>
+                              ))}
+                            </optgroup>
+                          )}
+                        </select>
+                        <p className="text-[11px] text-cyan-800/80">
+                          Assigned to general workshop & event participation certificates.
+                        </p>
+                      </div>
+                      <Link
+                        href={`/studio/editor/${categoryMappings.participant}?from=generate&eventId=${selectedEventId}`}
+                        className="mt-2 w-full flex items-center justify-center gap-1.5 bg-cyan-50 hover:bg-cyan-100 text-cyan-900 border border-cyan-300 font-bold text-xs py-2 px-3 rounded-xl transition"
+                      >
+                        <Edit3 className="w-3.5 h-3.5 text-cyan-700" />
+                        <span>Customize Participated Template</span>
+                      </Link>
                     </div>
                   </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                /* Single Unified Template UI */
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-bold text-xs text-slate-700 uppercase tracking-wider">Built-in Code Templates</h3>
+                    <Link
+                      href={`/studio/editor/${selectedTemplateId}?from=generate&eventId=${selectedEventId}`}
+                      className="flex items-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs px-3 py-1.5 rounded-lg border border-blue-200 transition"
+                    >
+                      <Palette className="w-3.5 h-3.5 text-blue-600" />
+                      <span>Customize Selected in Studio</span>
+                    </Link>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {BUILT_IN_TEMPLATES.map((tmpl) => (
+                      <div
+                        key={tmpl.id}
+                        onClick={() => setSelectedTemplateId(tmpl.id)}
+                        className={`p-4 rounded-2xl border cursor-pointer transition flex flex-col justify-between space-y-3 ${
+                          selectedTemplateId === tmpl.id
+                            ? 'bg-blue-50/80 border-blue-500 text-slate-900 shadow-xs ring-2 ring-blue-500/20'
+                            : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300'
+                        }`}
+                      >
+                        <div className="space-y-2">
+                          <div
+                            className="h-20 rounded-xl flex items-center justify-center font-bold text-xs shadow-inner p-2 text-center"
+                            style={{ backgroundColor: tmpl.backgroundColor || '#FFFFFF', color: '#0F172A' }}
+                          >
+                            {tmpl.name}
+                          </div>
+                          <div>
+                            <div className="flex items-center justify-between">
+                              <h4 className="font-bold text-xs text-slate-900 truncate">{tmpl.name}</h4>
+                              {selectedTemplateId === tmpl.id && (
+                                <span className="flex items-center gap-0.5 text-[9px] font-bold text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded-full">
+                                  <Check className="w-3 h-3" />
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[10px] text-slate-500 line-clamp-2 mt-0.5">{tmpl.description}</p>
+                          </div>
+                        </div>
+
+                        <Link
+                          href={`/studio/editor/${tmpl.id}?from=generate&eventId=${selectedEventId}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="w-full flex items-center justify-center gap-1 bg-white hover:bg-slate-100 text-slate-700 text-[11px] font-semibold py-1.5 rounded-lg border border-slate-200 transition"
+                        >
+                          <Edit3 className="w-3 h-3 text-blue-600" />
+                          <span>Edit in Studio</span>
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+
+                  {customTemplatesList.length > 0 && (
+                    <div className="space-y-3 border-t border-slate-100 pt-4">
+                      <h3 className="font-bold text-xs text-slate-700 uppercase tracking-wider">Custom & Saved Templates</h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {customTemplatesList.map((tmpl) => (
+                          <div
+                            key={tmpl.id}
+                            onClick={() => setSelectedTemplateId(tmpl.id)}
+                            className={`p-4 rounded-2xl border cursor-pointer transition flex flex-col justify-between space-y-2 ${
+                              selectedTemplateId === tmpl.id
+                                ? 'bg-blue-50/80 border-blue-500 text-slate-900 shadow-xs ring-2 ring-blue-500/20'
+                                : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300'
+                            }`}
+                          >
+                            <div>
+                              <div className="flex items-center justify-between">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded">
+                                  {tmpl.category}
+                                </span>
+                                {selectedTemplateId === tmpl.id ? (
+                                  <span className="flex items-center gap-1 text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full border border-blue-300">
+                                    <Check className="w-3 h-3" /> Selected
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] text-slate-400 font-mono">{tmpl.orientation}</span>
+                                )}
+                              </div>
+                              <h4 className="font-bold text-xs text-slate-900 mt-1">{tmpl.name}</h4>
+                              <p className="text-[11px] text-slate-500 line-clamp-1">{tmpl.description}</p>
+                            </div>
+
+                            <Link
+                              href={`/studio/editor/${tmpl.id}?from=generate&eventId=${selectedEventId}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="w-full flex items-center justify-center gap-1 bg-white hover:bg-slate-100 text-slate-700 text-[11px] font-semibold py-1.5 rounded-lg border border-slate-200 transition"
+                            >
+                              <Edit3 className="w-3 h-3 text-blue-600" />
+                              <span>Edit in Studio</span>
+                            </Link>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
@@ -497,9 +717,11 @@ export default function CertificateGeneratorWizard() {
                     <span>Selected Roster</span>
                   </h3>
                   <p className="font-bold text-slate-900 text-sm">{selectedRecipients.length} Participants</p>
-                  <p className="text-slate-500 text-[11px]">
-                    Template: {selectedTemplateId}
-                  </p>
+                  <div className="text-[11px] text-slate-600 space-y-0.5 pt-1 border-t border-slate-200/60">
+                    <p>Winners: <strong className="text-amber-700">{selectedRecipients.filter((r) => getNormalizedCategory(r) === 'winner').length}</strong></p>
+                    <p>Runners: <strong className="text-purple-700">{selectedRecipients.filter((r) => getNormalizedCategory(r) === 'runner').length}</strong></p>
+                    <p>Participants: <strong className="text-blue-700">{selectedRecipients.filter((r) => getNormalizedCategory(r) === 'participant').length}</strong></p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -527,33 +749,79 @@ export default function CertificateGeneratorWizard() {
                 </button>
               </div>
 
+              {/* Recipient Category Selector for Preview */}
+              {selectedRecipients.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-700">Preview Recipient Category:</span>
+                    <span className="text-[11px] text-slate-500 font-medium">
+                      Showing template layout & titles for: <strong>{activePreviewRecipient?.fullName}</strong>
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedRecipients.slice(0, 8).map((rec) => {
+                      const recCategory = getNormalizedCategory(rec);
+                      const isWinner = recCategory === 'winner';
+                      const isRunner = recCategory === 'runner';
+                      const isSelected = (activePreviewRecipient?.id || selectedRecipients[0]?.id) === rec.id;
+
+                      return (
+                        <button
+                          key={rec.id}
+                          type="button"
+                          onClick={() => setPreviewRecipientId(rec.id)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition ${
+                            isSelected
+                              ? isWinner
+                                ? 'bg-amber-100 text-amber-900 border-2 border-amber-500 shadow-xs'
+                                : isRunner
+                                ? 'bg-purple-100 text-purple-900 border-2 border-purple-500 shadow-xs'
+                                : 'bg-blue-100 text-blue-900 border-2 border-blue-500 shadow-xs'
+                              : 'bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200'
+                          }`}
+                        >
+                          <span>{isWinner ? '🏆' : isRunner ? '🥈' : '📜'}</span>
+                          <span>{rec.fullName}</span>
+                          <span className="text-[10px] opacity-75 font-mono capitalize">({recCategory})</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* Template Selection Summary Header */}
               <div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-blue-50/60 border border-blue-200 rounded-xl text-xs font-semibold text-slate-700">
                 <div className="flex items-center gap-2">
-                  <span className="text-slate-500">Previewing:</span>
+                  <span className="text-slate-500">Active Template:</span>
                   <span className="font-bold text-slate-900 font-mono">
-                    {customTemplatesList.find((t) => t.id === selectedTemplateId)?.name ||
-                      TEMPLATES.find((t) => t.id === selectedTemplateId)?.name ||
-                      selectedTemplateId}
+                    {customTemplatesList.find((t) => t.id === previewTemplateId)?.name ||
+                      TEMPLATES.find((t) => t.id === previewTemplateId)?.name ||
+                      previewTemplateId}
                   </span>
+                  {autoMapCategories && (
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-300 px-2 py-0.5 rounded-full">
+                      ⚡ Category Matched
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="px-2.5 py-0.5 rounded-md bg-teal-100 text-teal-800 font-bold uppercase text-[10px]">
-                    Type:{' '}
-                    {customTemplatesList.find((t) => t.id === selectedTemplateId)?.category || 'Built-in'}
+                    Role:{' '}
+                    {previewCategory.toUpperCase()}
                   </span>
                   <span className="px-2.5 py-0.5 rounded-md bg-indigo-100 text-indigo-800 font-bold uppercase text-[10px]">
                     Orientation:{' '}
-                    {customTemplatesList.find((t) => t.id === selectedTemplateId)?.orientation || 'landscape'}
+                    {customTemplatesList.find((t) => t.id === previewTemplateId)?.orientation || 'landscape'}
                   </span>
                 </div>
               </div>
 
               <div className="bg-slate-100 p-4 rounded-xl border border-slate-200 flex justify-center">
                 <CertificateRenderer
-                  key={selectedTemplateId}
+                  key={`${previewTemplateId}-${activePreviewRecipient?.id}`}
                   certificate={previewCertificateSnapshot}
-                  templateId={selectedTemplateId as TemplateId}
+                  templateId={previewTemplateId as TemplateId}
                 />
               </div>
             </div>
@@ -615,12 +883,12 @@ export default function CertificateGeneratorWizard() {
 
       {/* Stepper Wizard Controls */}
       {currentStep < 6 && (
-        <div className="flex items-center justify-between border-t border-slate-200 pt-6">
+        <div className="flex items-center justify-between border-t border-[#E2E8F0] pt-6">
           <button
             type="button"
             disabled={currentStep === 1}
             onClick={() => setCurrentStep((s) => Math.max(1, s - 1))}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 transition disabled:opacity-40"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-semibold bg-[#FFFFFF] text-[#475569] hover:bg-[#F8FAFC] border border-[#E2E8F0] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-all duration-200 disabled:opacity-40"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Previous Step</span>
@@ -639,7 +907,7 @@ export default function CertificateGeneratorWizard() {
                 setCurrentStep((s) => Math.min(6, s + 1));
               }
             }}
-            className="flex items-center gap-1.5 px-6 py-2.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition disabled:opacity-40"
+            className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-xs font-bold bg-[#2563EB] hover:bg-[#1D4ED8] text-white shadow-[0_2px_8px_rgba(37,99,235,0.25)] transition-all duration-200 disabled:opacity-40"
           >
             <span>{currentStep === 5 ? 'Issue Certificates' : 'Next Step'}</span>
             <ArrowRight className="w-4 h-4" />

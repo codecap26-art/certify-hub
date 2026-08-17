@@ -8,28 +8,67 @@ interface Props {
 }
 
 export const StatusBadge: React.FC<Props> = ({ status }) => {
-  const styles = {
-    Valid: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    Active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    Completed: 'bg-blue-50 text-blue-700 border-blue-200',
-    Draft: 'bg-slate-100 text-slate-700 border-slate-200',
-    Revoked: 'bg-red-50 text-red-700 border-red-200',
-  }[status];
+  const config: Record<
+    string,
+    { bg: string; text: string; border: string; dot: string }
+  > = {
+    Valid: {
+      bg:     'var(--success-light)',
+      text:   'var(--success-text)',
+      border: 'var(--success-border)',
+      dot:    'var(--success)',
+    },
+    Active: {
+      bg:     'var(--success-light)',
+      text:   'var(--success-text)',
+      border: 'var(--success-border)',
+      dot:    'var(--success)',
+    },
+    Completed: {
+      bg:     'var(--primary-light)',
+      text:   'var(--primary)',
+      border: 'var(--primary-border)',
+      dot:    'var(--primary)',
+    },
+    Draft: {
+      bg:     'var(--surface-subtle)',
+      text:   'var(--text-muted)',
+      border: 'var(--border)',
+      dot:    'var(--text-muted)',
+    },
+    Revoked: {
+      bg:     'var(--error-light)',
+      text:   'var(--error-text)',
+      border: 'var(--error-border)',
+      dot:    'var(--error)',
+    },
+  };
 
   const Icon = {
-    Valid: CheckCircle2,
-    Active: CheckCircle2,
+    Valid:     CheckCircle2,
+    Active:    CheckCircle2,
     Completed: CheckCircle2,
-    Draft: Clock,
-    Revoked: ShieldAlert,
+    Draft:     Clock,
+    Revoked:   ShieldAlert,
   }[status];
+
+  const c = config[status] || config.Draft;
 
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${styles}`}
+      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border"
+      style={{
+        backgroundColor: c.bg,
+        color:           c.text,
+        borderColor:     c.border,
+      }}
       aria-label={`Status: ${status}`}
     >
-      <Icon className="w-3 h-3 shrink-0" />
+      {/* Pulsing dot for active states */}
+      <span
+        className="w-1.5 h-1.5 rounded-full shrink-0"
+        style={{ backgroundColor: c.dot }}
+      />
       <span>{status}</span>
     </span>
   );

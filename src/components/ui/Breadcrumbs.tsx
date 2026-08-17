@@ -15,20 +15,33 @@ interface Props {
 
 export const Breadcrumbs: React.FC<Props> = ({ items }) => {
   return (
-    <nav aria-label="Breadcrumb" className="flex items-center text-xs text-slate-500 space-x-1.5 mb-2">
-      <Link href="/dashboard" className="hover:text-slate-900 transition flex items-center gap-1">
+    <nav aria-label="Breadcrumb" className="flex items-center flex-wrap gap-1 mb-2.5 text-xs">
+      <Link
+        href="/dashboard"
+        className="flex items-center gap-1 transition-colors hover:text-blue-600"
+        style={{ color: 'var(--text-muted)' }}
+      >
         <Home className="w-3.5 h-3.5" />
-        <span className="sr-only">Dashboard Home</span>
+        <span className="sr-only">Dashboard</span>
       </Link>
+
       {items.map((item, index) => (
         <React.Fragment key={index}>
-          <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+          <ChevronRight className="w-3 h-3 shrink-0" style={{ color: 'var(--border-strong)' }} />
           {item.href ? (
-            <Link href={item.href} className="hover:text-blue-600 transition">
+            <Link
+              href={item.href}
+              className="font-medium transition-colors hover:text-blue-600"
+              style={{ color: 'var(--text-muted)' }}
+            >
               {item.label}
             </Link>
           ) : (
-            <span className="font-semibold text-slate-800" aria-current="page">
+            <span
+              className="font-semibold"
+              style={{ color: 'var(--text-secondary)' }}
+              aria-current="page"
+            >
               {item.label}
             </span>
           )}

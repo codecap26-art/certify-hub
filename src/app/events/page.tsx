@@ -25,9 +25,13 @@ export default function EventsPage() {
       header: 'Event / Program Name',
       sortable: true,
       render: (evt) => (
-        <div>
-          <p className="font-bold text-slate-900 text-xs">{evt.name}</p>
-          <p className="text-[10px] text-slate-500 line-clamp-1">{evt.description}</p>
+        <div className="space-y-0.5">
+          <p className="font-semibold text-xs" style={{ color: 'var(--text-primary)' }}>
+            {evt.name}
+          </p>
+          <p className="text-[10px] line-clamp-1" style={{ color: 'var(--text-muted)' }}>
+            {evt.description}
+          </p>
         </div>
       ),
     },
@@ -36,7 +40,14 @@ export default function EventsPage() {
       header: 'Type',
       sortable: true,
       render: (evt) => (
-        <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 px-2.5 py-0.5 bg-blue-50 border border-blue-200 rounded-full">
+        <span
+          className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border"
+          style={{
+            backgroundColor: 'var(--primary-light)',
+            color: 'var(--primary)',
+            borderColor: 'var(--primary-border)',
+          }}
+        >
           {evt.eventType}
         </span>
       ),
@@ -46,9 +57,13 @@ export default function EventsPage() {
       header: 'Date & Location',
       sortable: true,
       render: (evt) => (
-        <div>
-          <p className="text-xs text-slate-800 font-medium">{evt.startDate}</p>
-          <p className="text-[10px] text-slate-500 line-clamp-1">{evt.location}</p>
+        <div className="space-y-0.5">
+          <p className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+            {evt.startDate}
+          </p>
+          <p className="text-[10px] line-clamp-1" style={{ color: 'var(--text-muted)' }}>
+            {evt.location}
+          </p>
         </div>
       ),
     },
@@ -64,8 +79,11 @@ export default function EventsPage() {
       render: (evt) => {
         const count = recipientRepository.getByEventId(evt.id).length;
         return (
-          <span className="text-xs font-semibold text-slate-700 flex items-center gap-1">
-            <Users className="w-3.5 h-3.5 text-teal-600" />
+          <span
+            className="flex items-center gap-1 text-xs font-semibold"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            <Users className="w-3.5 h-3.5" style={{ color: 'var(--info)' }} />
             <span>{count}</span>
           </span>
         );
@@ -78,7 +96,22 @@ export default function EventsPage() {
         <Link
           href={`/events/${evt.id}`}
           onClick={(e) => e.stopPropagation()}
-          className="flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200 transition"
+          className="flex items-center gap-1.5 text-[11px] font-semibold py-1.5 px-2.5 rounded-lg border transition-all"
+          style={{
+            backgroundColor: 'var(--primary-light)',
+            color: 'var(--primary)',
+            borderColor: 'var(--primary-border)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--primary)';
+            e.currentTarget.style.color = 'white';
+            e.currentTarget.style.borderColor = 'var(--primary)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--primary-light)';
+            e.currentTarget.style.color = 'var(--primary)';
+            e.currentTarget.style.borderColor = 'var(--primary-border)';
+          }}
         >
           <Eye className="w-3.5 h-3.5" />
           <span>Manage</span>
@@ -88,7 +121,7 @@ export default function EventsPage() {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <PageHeader
         title="Events & Academic Programs"
         description="Manage workshops, courses, hackathons, and internship programs."
@@ -97,7 +130,19 @@ export default function EventsPage() {
         action={
           <Link
             href="/events/new"
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-lg text-xs shadow-xs transition"
+            className="flex items-center gap-2 font-bold py-2 px-4 rounded-xl text-xs text-white transition-all"
+            style={{
+              backgroundColor: 'var(--primary)',
+              boxShadow: 'var(--shadow-sm)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--primary-hover)';
+              e.currentTarget.style.boxShadow = 'var(--shadow-primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--primary)';
+              e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+            }}
           >
             <PlusCircle className="w-4 h-4" />
             <span>Create New Event</span>

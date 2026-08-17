@@ -1,5 +1,11 @@
 import React from 'react';
 import { CertificateRecord } from '@/types';
+import {
+  getNormalizedCategory,
+  getCertificateCategoryTitle,
+  getCertificateMainTitle,
+  getCertificateRoleLabel,
+} from '@/lib/participantUtils';
 
 interface TemplateProps {
   certificate: Partial<CertificateRecord>;
@@ -10,6 +16,12 @@ export const AcademicMaroonTemplate: React.FC<TemplateProps> = ({ certificate, q
   const org = certificate.organizationSnapshot;
   const event = certificate.eventSnapshot;
   const recipient = certificate.recipientSnapshot;
+  const category = getNormalizedCategory(recipient || {});
+  const certCategoryTitle = getCertificateCategoryTitle(category, event?.certificateType);
+  const certMainTitle = getCertificateMainTitle(category, event?.certificateType);
+  const roleLabel = getCertificateRoleLabel(category, recipient?.achievement);
+  const isWinner = category === 'winner';
+  const isRunner = category === 'runner';
 
   return (
     <div
@@ -46,11 +58,11 @@ export const AcademicMaroonTemplate: React.FC<TemplateProps> = ({ certificate, q
       {/* Body Content */}
       <div className="relative z-10 text-center my-auto py-3">
         <p className="text-xs font-bold tracking-[0.2em] text-rose-800 uppercase mb-1">
-          Academic Certificate of {event?.certificateType || 'Achievement'}
+          Academic {certCategoryTitle}
         </p>
 
         <h1 className="text-3xl md:text-4xl font-extrabold text-rose-950 tracking-normal uppercase my-2">
-          Testimonial of Completion
+          {certMainTitle}
         </h1>
 
         <p className="text-xs text-rose-900 italic my-2">This credential is conferred upon</p>
@@ -62,9 +74,23 @@ export const AcademicMaroonTemplate: React.FC<TemplateProps> = ({ certificate, q
         </div>
 
         <p className="text-xs md:text-sm text-rose-900/90 max-w-2xl mx-auto leading-relaxed mt-3">
-          in recognition of commendable performance and completion of the program titled{' '}
+          {isWinner
+            ? `in recognition of superior merit and securing First Place distinction in the program titled `
+            : isRunner
+            ? `in recognition of commendable excellence and securing Runner-Up distinction in the program titled `
+            : `in recognition of commendable performance and active participation in the program titled `}
           <span className="font-bold text-rose-950">{event?.name || 'Event Title'}</span>.
-          {recipient?.achievement && recipient.achievement !== 'Participant' && (
+          {isWinner && (
+            <span className="block mt-2 font-bold text-amber-900 text-sm">
+              🏆 Commendation: {roleLabel}
+            </span>
+          )}
+          {isRunner && (
+            <span className="block mt-2 font-bold text-purple-950 text-sm">
+              🥈 Commendation: {roleLabel}
+            </span>
+          )}
+          {!isWinner && !isRunner && recipient?.achievement && recipient.achievement !== 'Participant' && (
             <span className="block mt-1 font-bold text-rose-900">Commendation: {recipient.achievement}</span>
           )}
         </p>

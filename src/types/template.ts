@@ -108,14 +108,31 @@ export interface TextStyleProps {
   lineHeight?: number;
   textTransform?: 'none' | 'uppercase' | 'lowercase' | 'capitalize';
   maxWidth?: number;
+  autoFit?: boolean;
+  minFontSize?: number;
+  maxFontSize?: number;
 }
 
+export type ShapeVariant =
+  | 'rectangle'
+  | 'rounded-rectangle'
+  | 'circle'
+  | 'ellipse'
+  | 'line'
+  | 'triangle'
+  | 'polygon'
+  | 'star'
+  | 'arrow';
+
 export interface ShapeStyleProps {
-  shapeType: 'rectangle' | 'circle' | 'line';
+  shapeType: ShapeVariant;
   fill: string;
   stroke: string;
   strokeWidth: number;
+  strokeStyle?: 'solid' | 'dashed' | 'dotted';
   cornerRadius?: number;
+  points?: number;
+  innerRadiusRatio?: number;
 }
 
 export interface ImageStyleProps {
@@ -158,6 +175,7 @@ export interface TemplateElement {
     width: number;
     cornerRadius?: number;
     padding?: number;
+    inset?: number;
   };
 
   dynamicBinding?: DynamicBindingKey;

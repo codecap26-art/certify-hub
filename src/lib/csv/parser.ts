@@ -32,6 +32,7 @@ export function parseRecipientCSV(
           const dept = row['department'] || row['dept'] || row['branch'] || '';
           const course = row['course'] || row['workshop'] || row['program'] || '';
           const achievement = row['achievement'] || row['position'] || row['role'] || '';
+          const category = row['category'] || row['group'] || row['participantcategory'] || row['participant_category'] || '';
 
           const trimmedName = name.trim();
           const trimmedEmail = email.trim().toLowerCase();
@@ -44,6 +45,7 @@ export function parseRecipientCSV(
               department: dept,
               course,
               achievement,
+              category,
               isValid: false,
               error: 'Full name is required',
             });
@@ -76,6 +78,7 @@ export function parseRecipientCSV(
             department: dept.trim(),
             course: course.trim(),
             achievement: achievement.trim(),
+            category: category.trim(),
             isValid: true,
             isDuplicate,
             error: duplicateMessage ? duplicateMessage : undefined,
@@ -94,13 +97,14 @@ export function parseRecipientCSV(
 }
 
 export function generateSampleCSV(): string {
-  const headers = 'name,email,registrationNumber,department,course,achievement\n';
+  const headers = 'name,email,registrationNumber,department,course,achievement,category\n';
   const sampleData = [
-    'Subash P,subash@example.com,23CS101,CSE,React Workshop,Participant',
-    'Arun Kumar,arun@example.com,23CS102,CSE,React Workshop,Participant',
-    'Priya S,priya@example.com,23CS103,IT,React Workshop,First Place',
-    'Kavin R,kavin@example.com,23CS104,ECE,React Workshop,Participant',
-    'Divya M,divya@example.com,23CS105,CSE,React Workshop,Second Place',
+    'Subash P,subash@example.com,23CS101,CSE,React Workshop,First Place,winner',
+    'Arun Kumar,arun@example.com,23CS102,CSE,React Workshop,First Place,winner',
+    'Priya S,priya@example.com,23CS103,IT,React Workshop,First Place,winner',
+    'Rahul K,rahul@example.com,23CS104,CSE,React Workshop,Second Place,runner',
+    'Karthik S,karthik@example.com,23CS105,ECE,React Workshop,Second Place,runner',
+    'Kavin R,kavin@example.com,23CS106,ECE,React Workshop,Participant,participant',
   ].join('\n');
 
   return headers + sampleData;

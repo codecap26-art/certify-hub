@@ -6,6 +6,11 @@ import { generateSafeFilename } from './codeGenerator';
 import { organizationRepository } from '../storage/organizationRepository';
 import { templateRepository } from '../storage/templateRepository';
 import { generatePdfFromCustomTemplate } from './customPdfGenerator';
+import {
+  getNormalizedCategory,
+  getCertificateCategoryTitle,
+  getCertificateRoleLabel,
+} from '@/lib/participantUtils';
 
 // A4 Landscape Dimensions in Points: 841.89 x 595.28
 const styles = StyleSheet.create({
@@ -75,11 +80,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#14B8A6',
     textTransform: 'uppercase',
     letterSpacing: 2,
     marginBottom: 8,
+    fontFamily: 'Helvetica-Bold',
   },
   mainTitle: {
     fontSize: 26,
@@ -114,6 +120,22 @@ const styles = StyleSheet.create({
     color: '#2DD4BF',
     fontWeight: 'bold',
     marginTop: 6,
+  },
+  winnerBadge: {
+    fontSize: 12,
+    color: '#F59E0B',
+    fontWeight: 'bold',
+    marginTop: 8,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
+  runnerBadge: {
+    fontSize: 12,
+    color: '#A78BFA',
+    fontWeight: 'bold',
+    marginTop: 8,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   footer: {
     display: 'flex',
@@ -172,9 +194,14 @@ export const CertificatePdfDocument: React.FC<PdfDocProps> = ({ certificate, qrD
   const org = certificate.organizationSnapshot;
   const event = certificate.eventSnapshot;
   const recipient = certificate.recipientSnapshot;
+  const category = getNormalizedCategory(recipient);
+  const categoryTitle = getCertificateCategoryTitle(category, event.certificateType);
+  const roleLabel = getCertificateRoleLabel(category, recipient.achievement);
+  const isWinner = category === 'winner';
+  const isRunner = category === 'runner';
 
   return (
-    <Document title={`Certificate - ${recipient.fullName}`}>
+    <Document title={`${categoryTitle} - ${recipient.fullName}`}>
       <Page size={{ width: 841.89, height: 595.28 }} style={styles.page}>
         <View style={styles.borderFrame} />
 
@@ -199,19 +226,28 @@ export const CertificatePdfDocument: React.FC<PdfDocProps> = ({ certificate, qrD
 
         {/* Body */}
         <View style={styles.body}>
-          <Text style={styles.subtitle}>Certificate of {event.certificateType}</Text>
+          <Text style={styles.subtitle}>{categoryTitle}</Text>
 
           <Text style={styles.mainTitle}>PROUDLY PRESENTED TO</Text>
 
           <Text style={styles.recipientName}>{recipient.fullName}</Text>
 
           <Text style={styles.description}>
-            For successful completion and participation in {event.name} held from {event.startDate}{' '}
-            {event.endDate ? `to ${event.endDate}` : ''}.
+            {isWinner
+              ? `For exceptional performance and securing Winner distinction in ${event.name} held from ${event.startDate}${event.endDate ? ` to ${event.endDate}` : ''}.`
+              : isRunner
+              ? `For commendable performance and securing Runner-Up distinction in ${event.name} held from ${event.startDate}${event.endDate ? ` to ${event.endDate}` : ''}.`
+              : `For successful completion and active participation in ${event.name} held from ${event.startDate}${event.endDate ? ` to ${event.endDate}` : ''}.`}
           </Text>
 
-          {recipient.achievement && recipient.achievement !== 'Participant' && (
-            <Text style={styles.achievementText}>Honored with: {recipient.achievement}</Text>
+          {isWinner && (
+            <Text style={styles.winnerBadge}>Awarded Distinction: {roleLabel}</Text>
+          )}
+          {isRunner && (
+            <Text style={styles.runnerBadge}>Awarded Distinction: {roleLabel}</Text>
+          )}
+          {!isWinner && !isRunner && recipient.achievement && recipient.achievement !== 'Participant' && (
+            <Text style={styles.achievementText}>Special Distinction: {recipient.achievement}</Text>
           )}
         </View>
 

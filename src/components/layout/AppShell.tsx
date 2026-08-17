@@ -37,27 +37,50 @@ export const AppShell: React.FC<Props> = ({ children }) => {
 
   if (isEditorPage) {
     return (
-      <div className="min-h-screen bg-slate-100 text-slate-900 font-sans antialiased">
-        {isClientLoaded ? children : <div className="animate-pulse h-screen bg-white" />}
+      <div className="min-h-screen font-sans antialiased" style={{ backgroundColor: '#F1F5F9', color: '#0F172A' }}>
+        {isClientLoaded ? children : (
+          <div
+            className="animate-pulse h-screen"
+            style={{ backgroundColor: 'var(--surface)' }}
+          />
+        )}
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col antialiased selection:bg-blue-100 selection:text-blue-900">
-      {/* Top Sticky Light Navbar */}
+    <div
+      className="min-h-screen font-sans flex flex-col antialiased"
+      style={{
+        backgroundColor: 'var(--background)',
+        color: 'var(--text-primary)',
+      }}
+    >
+      {/* Sticky Navbar */}
       <Navbar
         onToggleMobileMenu={() => setMobileMenuOpen(true)}
         onResetDemoData={() => setResetModalOpen(true)}
       />
 
-      {/* Main Container */}
+      {/* Main Layout */}
       <div className="flex-1 flex w-full">
         {!isStandalonePage && <Sidebar />}
 
-        {/* Page Viewport */}
-        <main className={`flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full ${isStandalonePage ? 'px-4' : ''}`}>
-          {isClientLoaded ? children : <div className="animate-pulse h-96 bg-white border border-slate-200 rounded-2xl" />}
+        {/* Page Content */}
+        <main
+          className={`flex-1 p-4 sm:p-6 lg:p-8 min-w-0 ${isStandalonePage ? 'max-w-7xl mx-auto w-full' : ''}`}
+        >
+          {isClientLoaded ? (
+            children
+          ) : (
+            <div
+              className="animate-pulse h-96 rounded-2xl border"
+              style={{
+                backgroundColor: 'var(--surface)',
+                borderColor: 'var(--border)',
+              }}
+            />
+          )}
         </main>
       </div>
 
@@ -68,39 +91,95 @@ export const AppShell: React.FC<Props> = ({ children }) => {
         onResetDemoData={() => setResetModalOpen(true)}
       />
 
-      {/* Confirmation Modal for Reset Demo Data */}
+      {/* Reset Demo Data Confirmation Modal */}
       {resetModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2 text-amber-600">
-                <AlertTriangle className="w-5 h-5" />
-                <h3 className="font-bold text-lg text-slate-900">Reset Demo Data</h3>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in"
+          style={{ backgroundColor: 'rgba(15, 23, 42, 0.5)', backdropFilter: 'blur(4px)' }}
+        >
+          <div
+            className="max-w-md w-full p-6 rounded-2xl border space-y-4"
+            style={{
+              backgroundColor: 'var(--surface)',
+              borderColor: 'var(--border)',
+              boxShadow: 'var(--shadow-xl)',
+            }}
+          >
+            {/* Modal Header */}
+            <div
+              className="flex items-center justify-between pb-4 border-b"
+              style={{ borderColor: 'var(--border)' }}
+            >
+              <div className="flex items-center gap-2.5">
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center"
+                  style={{
+                    backgroundColor: 'var(--warning-light)',
+                    color: 'var(--warning)',
+                  }}
+                >
+                  <AlertTriangle className="w-4 h-4" />
+                </div>
+                <h3 className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>
+                  Reset Demo Data
+                </h3>
               </div>
               <button
                 onClick={() => setResetModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg"
+                className="p-1.5 rounded-lg transition-colors"
+                style={{ color: 'var(--text-muted)' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-subtle)';
+                  e.currentTarget.style.color = 'var(--text-primary)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '';
+                  e.currentTarget.style.color = 'var(--text-muted)';
+                }}
                 aria-label="Close dialog"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Are you sure you want to reset all stored browser data? This will clear your custom events,
-              recipients, organization branding, and restore default demo records.
+            {/* Modal Body */}
+            <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+              Are you sure you want to reset all stored browser data? This will clear your custom
+              events, recipients, organization branding, and restore default demo records.
             </p>
 
+            {/* Modal Footer */}
             <div className="flex justify-end gap-3 pt-2">
               <button
                 onClick={() => setResetModalOpen(false)}
-                className="px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg border border-slate-200 transition"
+                className="px-4 py-2 text-xs font-semibold rounded-xl border transition-all"
+                style={{
+                  color: 'var(--text-secondary)',
+                  backgroundColor: 'var(--surface-subtle)',
+                  borderColor: 'var(--border)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--border)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-subtle)';
+                }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirmReset}
-                className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 rounded-lg transition shadow-sm"
+                className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white rounded-xl transition-all"
+                style={{
+                  backgroundColor: 'var(--warning)',
+                  boxShadow: 'var(--shadow-sm)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.filter = 'brightness(0.9)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.filter = '';
+                }}
               >
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span>Confirm Reset</span>

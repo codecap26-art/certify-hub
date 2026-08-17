@@ -7,6 +7,8 @@ import {
   Square,
   Circle as CircleIcon,
   Minus,
+  Triangle,
+  Star,
   Image as ImageIcon,
   QrCode,
   Building2,
@@ -16,12 +18,12 @@ import {
   Palette,
   ShieldAlert,
 } from 'lucide-react';
-import { ElementType, DynamicBindingKey, DYNAMIC_BINDING_OPTIONS } from '@/types/template';
+import { ElementType, DynamicBindingKey, DYNAMIC_BINDING_OPTIONS, ShapeVariant } from '@/types/template';
 
 interface Props {
   onAddText: (text: string, isHeading?: boolean) => void;
   onAddDynamicField: (key: DynamicBindingKey) => void;
-  onAddShape: (shapeType: 'rectangle' | 'circle' | 'line', isMask?: boolean) => void;
+  onAddShape: (shapeType: ShapeVariant, isMask?: boolean) => void;
   onAddImage: (dataUrl: string, name: string) => void;
   onAddQrCode: () => void;
   onSetBackground: (dataUrl: string) => void;
@@ -157,26 +159,66 @@ export const EditorSidebar: React.FC<Props> = ({
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => onAddShape('rectangle')}
-                  className="p-3 bg-slate-50 border border-slate-200 rounded-lg flex flex-col items-center gap-1.5 hover:bg-slate-100 transition"
+                  className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg flex flex-col items-center gap-1 hover:bg-blue-50 hover:border-blue-300 transition"
                 >
-                  <Square className="w-5 h-5 text-slate-700" />
-                  <span className="text-[11px] font-semibold">Rectangle</span>
+                  <Square className="w-4 h-4 text-slate-700" />
+                  <span className="text-[10px] font-semibold">Rectangle</span>
+                </button>
+
+                <button
+                  onClick={() => onAddShape('rounded-rectangle')}
+                  className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg flex flex-col items-center gap-1 hover:bg-blue-50 hover:border-blue-300 transition"
+                >
+                  <Square className="w-4 h-4 text-slate-700 rounded-xs" />
+                  <span className="text-[10px] font-semibold">Rounded Rect</span>
                 </button>
 
                 <button
                   onClick={() => onAddShape('circle')}
-                  className="p-3 bg-slate-50 border border-slate-200 rounded-lg flex flex-col items-center gap-1.5 hover:bg-slate-100 transition"
+                  className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg flex flex-col items-center gap-1 hover:bg-blue-50 hover:border-blue-300 transition"
                 >
-                  <CircleIcon className="w-5 h-5 text-slate-700" />
-                  <span className="text-[11px] font-semibold">Circle</span>
+                  <CircleIcon className="w-4 h-4 text-slate-700" />
+                  <span className="text-[10px] font-semibold">Circle</span>
+                </button>
+
+                <button
+                  onClick={() => onAddShape('ellipse')}
+                  className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg flex flex-col items-center gap-1 hover:bg-blue-50 hover:border-blue-300 transition"
+                >
+                  <CircleIcon className="w-4 h-4 text-slate-700 scale-x-125" />
+                  <span className="text-[10px] font-semibold">Ellipse</span>
                 </button>
 
                 <button
                   onClick={() => onAddShape('line')}
-                  className="p-3 bg-slate-50 border border-slate-200 rounded-lg flex flex-col items-center gap-1.5 hover:bg-slate-100 transition col-span-2"
+                  className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg flex flex-col items-center gap-1 hover:bg-blue-50 hover:border-blue-300 transition"
                 >
-                  <Minus className="w-5 h-5 text-slate-700" />
-                  <span className="text-[11px] font-semibold">Divider Line</span>
+                  <Minus className="w-4 h-4 text-slate-700" />
+                  <span className="text-[10px] font-semibold">Line</span>
+                </button>
+
+                <button
+                  onClick={() => onAddShape('triangle')}
+                  className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg flex flex-col items-center gap-1 hover:bg-blue-50 hover:border-blue-300 transition"
+                >
+                  <Triangle className="w-4 h-4 text-slate-700" />
+                  <span className="text-[10px] font-semibold">Triangle</span>
+                </button>
+
+                <button
+                  onClick={() => onAddShape('star')}
+                  className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg flex flex-col items-center gap-1 hover:bg-blue-50 hover:border-blue-300 transition"
+                >
+                  <Star className="w-4 h-4 text-slate-700" />
+                  <span className="text-[10px] font-semibold">Star</span>
+                </button>
+
+                <button
+                  onClick={() => onAddShape('polygon')}
+                  className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg flex flex-col items-center gap-1 hover:bg-blue-50 hover:border-blue-300 transition"
+                >
+                  <Square className="w-4 h-4 text-slate-700 rotate-45" />
+                  <span className="text-[10px] font-semibold">Polygon</span>
                 </button>
               </div>
             </div>

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Award, Lock, Mail, ArrowRight, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Award, Lock, Mail, ArrowRight, ShieldCheck, Info } from 'lucide-react';
 import { sessionRepository } from '@/lib/storage/sessionRepository';
 import { APP_NAME } from '@/lib/constants';
 import { motion } from 'framer-motion';
@@ -24,80 +24,196 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto py-12 space-y-8">
+    <div className="flex items-center justify-center min-h-[calc(100vh-5rem)] py-12 px-4">
       <motion.div
-        initial={{ opacity: 0, y: 12 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.25 }}
-        className="bg-white border border-slate-200 p-8 rounded-2xl space-y-6 shadow-xl"
+        transition={{ duration: 0.28, ease: 'easeOut' }}
+        className="w-full max-w-md"
       >
-        <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center mx-auto shadow-sm">
-            <Award className="w-7 h-7" />
-          </div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">{APP_NAME} Admin Login</h1>
-          <p className="text-xs text-slate-600">
-            Simulated Admin Demo Portal for Certificate Management
-          </p>
-        </div>
-
-        <form onSubmit={handleLogin} className="space-y-4 text-xs">
-          <div>
-            <label className="block font-semibold text-slate-700 mb-1" htmlFor="login-email">
-              Email Address
-            </label>
-            <div className="relative">
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                id="login-email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-lg pl-10 pr-4 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-              />
+        {/* Card */}
+        <div
+          className="rounded-2xl border p-8 space-y-7"
+          style={{
+            backgroundColor: 'var(--surface)',
+            borderColor: 'var(--border)',
+            boxShadow: 'var(--shadow-xl)',
+          }}
+        >
+          {/* Header */}
+          <div className="text-center space-y-3">
+            <div
+              className="w-12 h-12 rounded-2xl flex items-center justify-center text-white mx-auto"
+              style={{
+                background: 'linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)',
+                boxShadow: 'var(--shadow-primary)',
+              }}
+            >
+              <Award className="w-6 h-6" />
+            </div>
+            <div className="space-y-1">
+              <h1 className="text-xl font-extrabold tracking-tight" style={{ color: 'var(--text-primary)' }}>
+                {APP_NAME}
+              </h1>
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                Admin Demo Portal · Certificate Management
+              </p>
             </div>
           </div>
 
-          <div>
-            <label className="block font-semibold text-slate-700 mb-1" htmlFor="login-pass">
-              Password
-            </label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                id="login-pass"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-lg pl-10 pr-4 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-              />
+          {/* Form */}
+          <form onSubmit={handleLogin} className="space-y-4">
+            {/* Email */}
+            <div className="space-y-1.5">
+              <label
+                htmlFor="login-email"
+                className="block text-xs font-semibold"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail
+                  className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                  style={{ color: 'var(--text-muted)' }}
+                />
+                <input
+                  id="login-email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all"
+                  style={{
+                    backgroundColor: 'var(--surface-subtle)',
+                    borderColor: 'var(--border)',
+                    color: 'var(--text-primary)',
+                    outline: 'none',
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--primary)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-focus)';
+                    e.currentTarget.style.backgroundColor = 'var(--surface)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--border)';
+                    e.currentTarget.style.boxShadow = '';
+                    e.currentTarget.style.backgroundColor = 'var(--surface-subtle)';
+                  }}
+                />
+              </div>
             </div>
+
+            {/* Password */}
+            <div className="space-y-1.5">
+              <label
+                htmlFor="login-pass"
+                className="block text-xs font-semibold"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                Password
+              </label>
+              <div className="relative">
+                <Lock
+                  className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                  style={{ color: 'var(--text-muted)' }}
+                />
+                <input
+                  id="login-pass"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all"
+                  style={{
+                    backgroundColor: 'var(--surface-subtle)',
+                    borderColor: 'var(--border)',
+                    color: 'var(--text-primary)',
+                    outline: 'none',
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--primary)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-focus)';
+                    e.currentTarget.style.backgroundColor = 'var(--surface)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--border)';
+                    e.currentTarget.style.boxShadow = '';
+                    e.currentTarget.style.backgroundColor = 'var(--surface-subtle)';
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Primary CTA */}
+            <button
+              type="submit"
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold text-white transition-all"
+              style={{
+                backgroundColor: 'var(--primary)',
+                boxShadow: 'var(--shadow-sm)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--primary-hover)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--primary)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+              }}
+            >
+              <span>Sign In to Admin Portal</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </form>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px" style={{ backgroundColor: 'var(--border)' }} />
+            <span className="text-[11px] font-medium" style={{ color: 'var(--text-muted)' }}>
+              or
+            </span>
+            <div className="flex-1 h-px" style={{ backgroundColor: 'var(--border)' }} />
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-xs transition text-sm flex items-center justify-center gap-2"
-          >
-            <span>Sign In to Admin Portal</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </form>
-
-        <div className="relative border-t border-slate-100 pt-4 text-center">
+          {/* Quick Demo */}
           <button
             onClick={handleQuickDemo}
-            className="w-full bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold py-2.5 rounded-lg border border-slate-200 transition text-xs flex items-center justify-center gap-2"
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border text-xs font-semibold transition-all"
+            style={{
+              backgroundColor: 'var(--surface-subtle)',
+              borderColor: 'var(--border)',
+              color: 'var(--text-secondary)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--success-light)';
+              e.currentTarget.style.borderColor = 'var(--success-border)';
+              e.currentTarget.style.color = 'var(--success-text)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--surface-subtle)';
+              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
           >
-            <ShieldCheck className="w-4 h-4 text-teal-600" />
+            <ShieldCheck className="w-4 h-4" style={{ color: 'var(--success)' }} />
             <span>Continue with Demo Account</span>
           </button>
-        </div>
 
-        <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-[11px] text-slate-600 flex items-start gap-2">
-          <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
-          <span>Demo authentication uses browser `localStorage`. No real password check or backend connection is required.</span>
+          {/* Info note */}
+          <div
+            className="flex items-start gap-2.5 rounded-xl p-3 border text-[11px] leading-relaxed"
+            style={{
+              backgroundColor: 'var(--info-light)',
+              borderColor: 'var(--info-border)',
+              color: 'var(--info-text)',
+            }}
+          >
+            <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+            <span>
+              Demo authentication uses browser localStorage. No real password check or backend connection required.
+            </span>
+          </div>
         </div>
       </motion.div>
     </div>

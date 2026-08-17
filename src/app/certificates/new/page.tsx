@@ -13,6 +13,7 @@ import { templateRepository } from '@/lib/storage/templateRepository';
 import { CustomTemplate } from '@/types/template';
 import { runQualityAudit, QualityReport } from '@/lib/editor/qualityChecker';
 import { CertificateDocument, migrateFromLegacy } from '@/lib/editor/documentModel';
+import { getCategoryDefaultTemplateId } from '@/lib/template/categoryTemplateUtils';
 
 export default function IndividualCertificatePage() {
   const [templates, setTemplates] = useState<CustomTemplate[]>([]);
@@ -20,6 +21,7 @@ export default function IndividualCertificatePage() {
   const [recipientName, setRecipientName] = useState('SUBASH P');
   const [recipientEmail, setRecipientEmail] = useState('subash@example.com');
   const [registrationNumber, setRegistrationNumber] = useState('23CS101');
+  const [recipientCategory, setRecipientCategory] = useState<'winner' | 'runner' | 'participant'>('participant');
   const [eventName, setEventName] = useState('SOFTWARE INNOVATION CHALLENGE 2026');
   const [certificateCode, setCertificateCode] = useState(`ID: CERT-2026-IND-${Math.floor(1000 + Math.random() * 9000)}`);
   const [qualityReport, setQualityReport] = useState<QualityReport | null>(null);
@@ -27,8 +29,19 @@ export default function IndividualCertificatePage() {
   useEffect(() => {
     const list = templateRepository.getAll();
     setTemplates(list);
-    if (list.length > 0) setSelectedTemplateId(list[0].id);
+    if (list.length > 0) {
+      const defaultId = getCategoryDefaultTemplateId(recipientCategory, list);
+      setSelectedTemplateId(defaultId || list[0].id);
+    }
   }, []);
+
+  const handleCategoryChange = (cat: 'winner' | 'runner' | 'participant') => {
+    setRecipientCategory(cat);
+    const matchedId = getCategoryDefaultTemplateId(cat, templates);
+    if (matchedId) {
+      setSelectedTemplateId(matchedId);
+    }
+  };
 
   const handleRunAudit = () => {
     const selected = templates.find((t) => t.id === selectedTemplateId);
@@ -39,7 +52,7 @@ export default function IndividualCertificatePage() {
   };
 
   const handleGeneratePdf = () => {
-    alert(`Generating print-quality PDF for recipient ${recipientName}...`);
+    alert(`Generating print-quality PDF for recipient ${recipientName} (${recipientCategory.toUpperCase()})...`);
   };
 
   return (
@@ -72,8 +85,52 @@ export default function IndividualCertificatePage() {
         </div>
 
         {/* Step 2: Recipient Details */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <label className="font-bold text-sm text-slate-900 block">Step 2: Recipient Details</label>
+
+          {/* Role / Status Question Box */}
+          <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl space-y-2">
+            <span className="block font-bold text-slate-800">Is this recipient a Winner, Runner, or Participated? *</span>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => handleCategoryChange('winner')}
+                className={`p-2.5 rounded-xl border text-center font-bold text-xs transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+                  recipientCategory === 'winner'
+                    ? 'bg-[#FFFBEB] border-[#FCD34D] text-[#92400E] ring-2 ring-[#FCD34D]/50 shadow-xs'
+                    : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                <span className="text-base">🏆</span>
+                <span>Winner</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleCategoryChange('runner')}
+                className={`p-2.5 rounded-xl border text-center font-bold text-xs transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+                  recipientCategory === 'runner'
+                    ? 'bg-[#F5F3FF] border-[#C4B5FD] text-[#5B21B6] ring-2 ring-[#C4B5FD]/50 shadow-xs'
+                    : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                <span className="text-base">🥈</span>
+                <span>Runner</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleCategoryChange('participant')}
+                className={`p-2.5 rounded-xl border text-center font-bold text-xs transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+                  recipientCategory === 'participant'
+                    ? 'bg-[#ECFEFF] border-[#67E8F9] text-[#155E75] ring-2 ring-[#67E8F9]/50 shadow-xs'
+                    : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                <span className="text-base">📜</span>
+                <span>Participated</span>
+              </button>
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <div>
               <span className="block font-semibold text-slate-700 mb-1">Full Name</span>

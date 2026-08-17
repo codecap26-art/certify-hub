@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Upload, AlertCircle } from 'lucide-react';
+import { Upload, AlertCircle, X, ImageIcon } from 'lucide-react';
 import { compressImageDataUrl } from '@/lib/utils/imageCompressor';
 
 interface Props {
@@ -55,30 +55,52 @@ export const FileUploader: React.FC<Props> = ({
 
   return (
     <div className="space-y-2">
-      <label className="block text-xs font-semibold text-slate-700">{label}</label>
+      <label
+        className="block text-xs font-semibold"
+        style={{ color: 'var(--text-secondary)' }}
+      >
+        {label}
+      </label>
 
       <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          setIsDragging(true);
-        }}
+        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
-        className={`relative border-2 border-dashed rounded-xl p-4 flex flex-col items-center justify-center text-center space-y-3 min-h-[160px] transition ${
-          isDragging
-            ? 'border-blue-500 bg-blue-50'
+        className="relative rounded-xl border-2 border-dashed transition-all min-h-[160px] flex flex-col items-center justify-center text-center p-5 space-y-3"
+        style={{
+          borderColor: isDragging
+            ? 'var(--primary)'
+            : error
+            ? 'var(--error)'
             : value
-            ? 'border-slate-300 bg-white'
-            : 'border-slate-300 hover:border-blue-400 bg-slate-50'
-        }`}
+            ? 'var(--border-strong)'
+            : 'var(--border)',
+          backgroundColor: isDragging
+            ? 'var(--primary-light)'
+            : value
+            ? 'var(--surface)'
+            : 'var(--surface-subtle)',
+        }}
       >
         {value ? (
-          <div className="relative group flex flex-col items-center space-y-2">
+          <div className="flex flex-col items-center gap-3">
+            {/* Preview image */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={value} alt="Upload Preview" className="h-24 w-auto object-contain rounded-lg border border-slate-200 shadow-xs" />
-            <div className="flex items-center gap-2">
-              <label className="cursor-pointer text-[11px] font-semibold text-blue-600 hover:text-blue-700 underline">
-                <span>Replace File</span>
+            <img
+              src={value}
+              alt="Upload Preview"
+              className="h-20 w-auto object-contain rounded-lg border"
+              style={{ borderColor: 'var(--border)' }}
+            />
+            <div className="flex items-center gap-3">
+              <label
+                className="cursor-pointer text-xs font-semibold transition-colors flex items-center gap-1"
+                style={{ color: 'var(--primary)' }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--primary-hover)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--primary)'; }}
+              >
+                <ImageIcon className="w-3 h-3" />
+                <span>Replace</span>
                 <input
                   type="file"
                   accept={accept}
@@ -89,24 +111,41 @@ export const FileUploader: React.FC<Props> = ({
                   className="hidden"
                 />
               </label>
+              <span style={{ color: 'var(--border-strong)' }}>·</span>
               <button
                 type="button"
                 onClick={() => onChange('')}
-                className="text-[11px] font-semibold text-rose-600 hover:text-rose-700 underline"
+                className="text-xs font-semibold transition-colors flex items-center gap-1"
+                style={{ color: 'var(--error-text)' }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--error)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--error-text)'; }}
               >
-                Remove
+                <X className="w-3 h-3" />
+                <span>Remove</span>
               </button>
             </div>
           </div>
         ) : (
           <>
-            <div className="w-10 h-10 rounded-full bg-slate-200/80 flex items-center justify-center text-slate-600">
+            <div
+              className="w-11 h-11 rounded-xl flex items-center justify-center border"
+              style={{
+                backgroundColor: isDragging ? 'var(--primary-light)' : 'var(--surface)',
+                borderColor: isDragging ? 'var(--primary-border)' : 'var(--border)',
+                color: isDragging ? 'var(--primary)' : 'var(--text-muted)',
+              }}
+            >
               <Upload className="w-5 h-5" />
             </div>
             <div className="space-y-1">
-              <p className="text-xs font-semibold text-slate-700">
+              <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
                 Drag & drop or{' '}
-                <label className="text-blue-600 hover:underline cursor-pointer font-bold">
+                <label
+                  className="cursor-pointer font-bold transition-colors"
+                  style={{ color: 'var(--primary)' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--primary-hover)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--primary)'; }}
+                >
                   browse file
                   <input
                     type="file"
@@ -119,15 +158,19 @@ export const FileUploader: React.FC<Props> = ({
                   />
                 </label>
               </p>
-              {helperText && <p className="text-[11px] text-slate-500">{helperText}</p>}
+              {helperText && (
+                <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>
+                  {helperText}
+                </p>
+              )}
             </div>
           </>
         )}
       </div>
 
       {error && (
-        <p className="text-xs text-rose-600 flex items-center gap-1">
-          <AlertCircle className="w-3.5 h-3.5" />
+        <p className="text-xs flex items-center gap-1.5" style={{ color: 'var(--error-text)' }}>
+          <AlertCircle className="w-3.5 h-3.5 shrink-0" />
           <span>{error}</span>
         </p>
       )}

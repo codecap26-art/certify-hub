@@ -19,6 +19,7 @@ import {
   Palette,
 } from 'lucide-react';
 import { TEMPLATES } from '@/lib/constants';
+import { BUILT_IN_TEMPLATES } from '@/lib/template/builtInTemplates';
 import { TemplateId, CertificateRecord } from '@/types';
 import { CustomTemplate } from '@/types/template';
 import { templateRepository } from '@/lib/storage/templateRepository';
@@ -58,6 +59,7 @@ const sampleCertificate: CertificateRecord = {
     department: 'Computer Science & Engineering',
     course: 'React Development Workshop',
     achievement: 'First Place - Hackathon',
+    category: 'winner',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
@@ -71,7 +73,7 @@ export default function TemplatesPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>('built-in');
   const [customTemplates, setCustomTemplates] = useState<CustomTemplate[]>([]);
-  const [selectedBuiltInId, setSelectedBuiltInId] = useState<TemplateId>('modern-blue');
+  const [selectedBuiltInId, setSelectedBuiltInId] = useState<string>('tmpl-competition-winner');
 
   // Search & Filter
   const [searchTerm, setSearchTerm] = useState('');
@@ -111,6 +113,25 @@ export default function TemplatesPage() {
   });
 
   const handleDuplicateBuiltIn = async (builtInId: string) => {
+    const richBuiltIn = BUILT_IN_TEMPLATES.find((t) => t.id === builtInId);
+    if (richBuiltIn) {
+      const copyId = `tmpl-custom-${Date.now()}`;
+      const copy: CustomTemplate = {
+        ...richBuiltIn,
+        id: copyId,
+        name: `${richBuiltIn.name} (Custom Copy)`,
+        description: `Customized copy of built-in ${richBuiltIn.name} template`,
+        category: 'Custom',
+        isBuiltIn: false,
+        elements: richBuiltIn.elements.map((el) => ({ ...el, id: `el-${Date.now()}-${Math.random().toString(36).slice(2, 6)}` })),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      await templateRepository.save(copy);
+      router.push(`/studio/editor/${copy.id}`);
+      return;
+    }
+
     const builtIn = TEMPLATES.find((t) => t.id === builtInId);
     if (!builtIn) return;
 
@@ -239,73 +260,160 @@ export default function TemplatesPage() {
         ))}
       </div>
 
-      {/* Method 1: Built-in Code Templates */}
+      {/* Method 1: Built-in Templates */}
       {activeTab === 'built-in' && (
         <div className="space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {TEMPLATES.map((tmpl) => (
-              <div
-                key={tmpl.id}
-                onClick={() => setSelectedBuiltInId(tmpl.id)}
-                className={`p-5 rounded-2xl border cursor-pointer transition space-y-3 ${
-                  selectedBuiltInId === tmpl.id
-                    ? 'bg-blue-50/80 border-blue-500 shadow-sm ring-2 ring-blue-500/20'
-                    : 'bg-white border-slate-200 hover:border-slate-300 shadow-xs'
-                }`}
-              >
+          <div className="space-y-3">
+            <h3 className="font-bold text-xs text-slate-700 uppercase tracking-wider">
+              Specialized Role & Achievement Templates (Winner, Runner, Participated)
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {BUILT_IN_TEMPLATES.map((tmpl) => (
                 <div
-                  className="h-28 rounded-xl flex items-center justify-center font-bold text-xs shadow-inner"
-                  style={{ backgroundColor: tmpl.theme.cardBg, color: tmpl.theme.primary }}
+                  key={tmpl.id}
+                  onClick={() => setSelectedBuiltInId(tmpl.id)}
+                  className={`p-4 rounded-2xl border cursor-pointer transition flex flex-col justify-between space-y-3 ${
+                    selectedBuiltInId === tmpl.id
+                      ? 'bg-blue-50/80 border-blue-500 shadow-sm ring-2 ring-blue-500/20'
+                      : 'bg-white border-slate-200 hover:border-slate-300 shadow-xs'
+                  }`}
                 >
-                  {tmpl.name}
-                </div>
-                <div>
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-bold text-xs text-slate-900">{tmpl.name}</h3>
-                    {selectedBuiltInId === tmpl.id && (
-                      <span className="flex items-center gap-1 text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full border border-blue-200">
-                        <Check className="w-3 h-3" />
-                        <span>Active</span>
-                      </span>
-                    )}
+                  <div className="space-y-2">
+                    <div
+                      className="h-24 rounded-xl flex items-center justify-center font-bold text-xs shadow-inner p-2 text-center"
+                      style={{ backgroundColor: tmpl.backgroundColor || '#FFFFFF', color: '#0F172A' }}
+                    >
+                      {tmpl.name}
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-bold text-xs text-slate-900 truncate">{tmpl.name}</h4>
+                        {selectedBuiltInId === tmpl.id && (
+                          <span className="flex items-center gap-0.5 text-[9px] font-bold text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded-full">
+                            <Check className="w-3 h-3" />
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-slate-500 line-clamp-2 mt-0.5">{tmpl.description}</p>
+                    </div>
                   </div>
-                  <p className="text-[11px] text-slate-600 line-clamp-2 mt-1">{tmpl.description}</p>
 
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDuplicateBuiltIn(tmpl.id);
-                    }}
-                    className="w-full mt-3 flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-1.5 px-3 rounded-lg text-[11px] border border-slate-200 transition"
-                  >
-                    <Palette className="w-3.5 h-3.5 text-blue-600" />
-                    <span>Customize in Studio</span>
-                  </button>
+                  <div className="pt-2 border-t border-slate-100 space-y-1.5">
+                    <Link
+                      href={`/generate?templateId=${tmpl.id}`}
+                      className="w-full flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-3 rounded-lg text-[11px] transition shadow-xs"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <span>Use in Generator</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </Link>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDuplicateBuiltIn(tmpl.id);
+                      }}
+                      className="w-full flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-1.5 px-3 rounded-lg text-[11px] border border-slate-200 transition"
+                    >
+                      <Palette className="w-3.5 h-3.5 text-blue-600" />
+                      <span>Customize in Studio</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-3 pt-4 border-t border-slate-200">
+            <h3 className="font-bold text-xs text-slate-700 uppercase tracking-wider">
+              Classic Built-in Vector Themes
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {TEMPLATES.map((tmpl) => (
+                <div
+                  key={tmpl.id}
+                  onClick={() => setSelectedBuiltInId(tmpl.id)}
+                  className={`p-4 rounded-2xl border cursor-pointer transition flex flex-col justify-between space-y-3 ${
+                    selectedBuiltInId === tmpl.id
+                      ? 'bg-blue-50/80 border-blue-500 shadow-sm ring-2 ring-blue-500/20'
+                      : 'bg-white border-slate-200 hover:border-slate-300 shadow-xs'
+                  }`}
+                >
+                  <div className="space-y-2">
+                    <div
+                      className="h-20 rounded-xl flex items-center justify-center font-bold text-xs shadow-inner"
+                      style={{ backgroundColor: tmpl.theme.cardBg, color: tmpl.theme.primary }}
+                    >
+                      {tmpl.name}
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-bold text-xs text-slate-900">{tmpl.name}</h4>
+                        {selectedBuiltInId === tmpl.id && (
+                          <span className="flex items-center gap-1 text-[10px] font-bold text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded-full">
+                            <Check className="w-3 h-3" />
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-slate-500 line-clamp-2 mt-0.5">{tmpl.description}</p>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-100 space-y-1.5">
+                    <Link
+                      href={`/generate?templateId=${tmpl.id}`}
+                      className="w-full flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-3 rounded-lg text-[11px] transition shadow-xs"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <span>Use in Generator</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </Link>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDuplicateBuiltIn(tmpl.id);
+                      }}
+                      className="w-full flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-1.5 px-3 rounded-lg text-[11px] border border-slate-200 transition"
+                    >
+                      <Palette className="w-3.5 h-3.5 text-blue-600" />
+                      <span>Customize in Studio</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="bg-white border border-slate-200 p-6 rounded-2xl space-y-4 shadow-xs">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <span className="text-xs font-bold text-slate-900">
-                Active Code Template:{' '}
+                Active Preview Template:{' '}
                 <span className="text-blue-600 font-mono">
-                  {TEMPLATES.find((t) => t.id === selectedBuiltInId)?.name}
+                  {BUILT_IN_TEMPLATES.find((t) => t.id === selectedBuiltInId)?.name ||
+                    TEMPLATES.find((t) => t.id === selectedBuiltInId)?.name ||
+                    selectedBuiltInId}
                 </span>
               </span>
 
-              <Link
-                href="/generate"
-                className="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1"
-              >
-                <span>Use in Certificate Generator</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link
+                  href={`/studio/editor/${selectedBuiltInId}`}
+                  className="text-xs font-bold text-slate-700 hover:text-blue-600 flex items-center gap-1 bg-slate-100 px-3 py-1.5 rounded-lg transition"
+                >
+                  <Palette className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Customize in Studio</span>
+                </Link>
+                <Link
+                  href={`/generate?templateId=${selectedBuiltInId}`}
+                  className="text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 flex items-center gap-1 px-3 py-1.5 rounded-lg transition shadow-xs"
+                >
+                  <span>Use in Bulk Generator</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
             </div>
 
-            <div className="bg-slate-100 p-4 rounded-xl border border-slate-200">
-              <CertificateRenderer certificate={sampleCertificate} templateId={selectedBuiltInId} />
+            <div className="bg-slate-100 p-4 rounded-xl border border-slate-200 flex justify-center">
+              <CertificateRenderer certificate={sampleCertificate} templateId={selectedBuiltInId as TemplateId} />
             </div>
           </div>
         </div>

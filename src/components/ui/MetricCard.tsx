@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
+import { TrendingUp } from 'lucide-react';
 
 interface Props {
   label: string;
@@ -31,7 +32,7 @@ export const MetricCard: React.FC<Props> = ({
 
     let start = 0;
     const end = value;
-    const duration = 800; // ms
+    const duration = 800;
     const increment = Math.ceil(end / (duration / 16));
 
     const timer = setInterval(() => {
@@ -47,34 +48,80 @@ export const MetricCard: React.FC<Props> = ({
     return () => clearInterval(timer);
   }, [isInView, value]);
 
-  const colorStyles = {
-    blue: 'bg-blue-50 border-blue-200 text-blue-700',
-    teal: 'bg-teal-50 border-teal-200 text-teal-700',
-    indigo: 'bg-indigo-50 border-indigo-200 text-indigo-700',
-    emerald: 'bg-emerald-50 border-emerald-200 text-emerald-700',
-    rose: 'bg-rose-50 border-rose-200 text-rose-700',
-    amber: 'bg-amber-50 border-amber-200 text-amber-700',
-  }[color];
+  // Map color to semantic CSS variables
+  const colorMap: Record<string, { bg: string; icon: string; border: string }> = {
+    blue:    { bg: 'var(--primary-light)',   icon: 'var(--primary)',  border: 'var(--primary-border)' },
+    teal:    { bg: 'var(--info-light)',       icon: 'var(--info)',     border: 'var(--info-border)' },
+    indigo:  { bg: 'var(--primary-light)',   icon: 'var(--primary)',  border: 'var(--primary-border)' },
+    emerald: { bg: 'var(--success-light)',   icon: 'var(--success)',  border: 'var(--success-border)' },
+    rose:    { bg: 'var(--error-light)',     icon: 'var(--error)',    border: 'var(--error-border)' },
+    amber:   { bg: 'var(--warning-light)',   icon: 'var(--warning)',  border: 'var(--warning-border)' },
+  };
+
+  const c = colorMap[color] || colorMap.blue;
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
       whileHover={{ y: -2, transition: { duration: 0.15 } }}
-      className="bg-white border border-slate-200 p-5 rounded-2xl space-y-2 shadow-xs hover:border-slate-300 transition"
+      className="relative overflow-hidden rounded-2xl border p-5 space-y-3 transition-all duration-200"
+      style={{
+        backgroundColor: 'var(--surface)',
+        borderColor: 'var(--border)',
+        boxShadow: 'var(--shadow-sm)',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = 'var(--border-strong)';
+        e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = 'var(--border)';
+        e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+      }}
     >
+      {/* Top accent strip */}
+      <div
+        className="absolute top-0 left-0 right-0 h-0.5 rounded-t-2xl"
+        style={{ backgroundColor: c.icon }}
+      />
+
+      {/* Label + Icon */}
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-slate-600">{label}</span>
-        <div className={`p-2 rounded-xl border ${colorStyles}`}>
+        <span className="text-xs font-semibold tracking-wide" style={{ color: 'var(--text-muted)' }}>
+          {label}
+        </span>
+        <div
+          className="w-8 h-8 rounded-xl flex items-center justify-center border"
+          style={{
+            backgroundColor: c.bg,
+            borderColor: c.border,
+            color: c.icon,
+          }}
+        >
           <Icon className="w-4 h-4" />
         </div>
       </div>
 
-      <div className="flex items-baseline justify-between">
-        <span className="text-3xl font-extrabold text-slate-900 tracking-tight">{displayValue}</span>
-        {trend && <span className="text-[11px] font-medium text-slate-500">{trend}</span>}
+      {/* Value + Trend */}
+      <div className="flex items-baseline justify-between gap-2">
+        <span
+          className="text-3xl font-extrabold tracking-tight tabular-nums"
+          style={{ color: 'var(--text-primary)' }}
+        >
+          {displayValue.toLocaleString()}
+        </span>
+        {trend && (
+          <span
+            className="flex items-center gap-1 text-[11px] font-semibold"
+            style={{ color: 'var(--text-muted)' }}
+          >
+            <TrendingUp className="w-3 h-3" />
+            {trend}
+          </span>
+        )}
       </div>
     </motion.div>
   );

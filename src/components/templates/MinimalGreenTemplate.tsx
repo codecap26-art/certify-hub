@@ -1,5 +1,11 @@
 import React from 'react';
 import { CertificateRecord } from '@/types';
+import {
+  getNormalizedCategory,
+  getCertificateCategoryTitle,
+  getCertificateMainTitle,
+  getCertificateRoleLabel,
+} from '@/lib/participantUtils';
 
 interface TemplateProps {
   certificate: Partial<CertificateRecord>;
@@ -10,6 +16,12 @@ export const MinimalGreenTemplate: React.FC<TemplateProps> = ({ certificate, qrC
   const org = certificate.organizationSnapshot;
   const event = certificate.eventSnapshot;
   const recipient = certificate.recipientSnapshot;
+  const category = getNormalizedCategory(recipient || {});
+  const certCategoryTitle = getCertificateCategoryTitle(category, event?.certificateType);
+  const certMainTitle = getCertificateMainTitle(category, event?.certificateType);
+  const roleLabel = getCertificateRoleLabel(category, recipient?.achievement);
+  const isWinner = category === 'winner';
+  const isRunner = category === 'runner';
 
   return (
     <div
@@ -47,11 +59,11 @@ export const MinimalGreenTemplate: React.FC<TemplateProps> = ({ certificate, qrC
       {/* Body Content */}
       <div className="relative z-10 text-center my-auto py-4 pl-4">
         <p className="text-xs font-semibold tracking-widest text-emerald-400 uppercase mb-2">
-          {event?.certificateType || 'Completion'} Certificate
+          {certCategoryTitle}
         </p>
 
         <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-2">
-          CERTIFICATE OF PARTICIPATION
+          {certMainTitle}
         </h1>
 
         <p className="text-xs text-emerald-300 mb-4">is presented to</p>
@@ -63,9 +75,23 @@ export const MinimalGreenTemplate: React.FC<TemplateProps> = ({ certificate, qrC
         </div>
 
         <p className="text-xs md:text-sm text-emerald-100/90 max-w-2xl mx-auto leading-relaxed">
-          For demonstrating dedication and successfully participating in{' '}
+          {isWinner
+            ? `For exceptional accomplishment and securing First Place distinction in `
+            : isRunner
+            ? `For outstanding performance and securing Runner-Up distinction in `
+            : `For demonstrating dedication and successfully participating in `}
           <span className="font-bold text-white">{event?.name || 'Event Title'}</span>.
-          {recipient?.achievement && recipient.achievement !== 'Participant' && (
+          {isWinner && (
+            <span className="block mt-2 font-bold text-amber-300 text-sm">
+              🏆 Awarded Distinction: {roleLabel}
+            </span>
+          )}
+          {isRunner && (
+            <span className="block mt-2 font-bold text-purple-300 text-sm">
+              🥈 Awarded Distinction: {roleLabel}
+            </span>
+          )}
+          {!isWinner && !isRunner && recipient?.achievement && recipient.achievement !== 'Participant' && (
             <span className="block mt-1 text-emerald-300 font-semibold">Special Distinction: {recipient.achievement}</span>
           )}
         </p>

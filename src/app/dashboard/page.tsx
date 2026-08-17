@@ -13,6 +13,7 @@ import {
   ArrowRight,
   Building2,
   FileSpreadsheet,
+  Layers,
 } from 'lucide-react';
 import { eventRepository } from '@/lib/storage/eventRepository';
 import { recipientRepository } from '@/lib/storage/recipientRepository';
@@ -50,114 +51,205 @@ export default function DashboardPage() {
   const recentCertificates = certificates.slice(0, 5);
 
   return (
-    <div className="space-y-8">
-      {/* Standardized Page Header */}
+    <div className="space-y-6">
+      {/* Page Header */}
       <PageHeader
         title={orgName || 'ABC Engineering College'}
         description="Overview of active programs, student rosters, and certificate credentials."
         icon={Building2}
         action={
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <Link
               href="/events/new"
-              className="flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs py-2.5 px-4 rounded-lg border border-slate-200 shadow-xs transition"
+              className="flex items-center gap-2 text-xs font-semibold py-2 px-3.5 rounded-xl border transition-all"
+              style={{
+                backgroundColor: 'var(--surface-subtle)',
+                borderColor: 'var(--border)',
+                color: 'var(--text-secondary)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--border)';
+                e.currentTarget.style.color = 'var(--text-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--surface-subtle)';
+                e.currentTarget.style.color = 'var(--text-secondary)';
+              }}
             >
-              <PlusCircle className="w-4 h-4 text-blue-600" />
+              <PlusCircle className="w-3.5 h-3.5" style={{ color: 'var(--primary)' }} />
               <span>Create Event</span>
             </Link>
 
             <Link
               href="/generate"
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs py-2.5 px-4 rounded-lg shadow-sm transition"
+              className="flex items-center gap-2 text-xs font-bold text-white py-2 px-3.5 rounded-xl transition-all"
+              style={{
+                background: 'linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)',
+                boxShadow: 'var(--shadow-sm)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = 'var(--shadow-primary)';
+                e.currentTarget.style.filter = 'brightness(1.06)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                e.currentTarget.style.filter = '';
+              }}
             >
-              <Sparkles className="w-4 h-4" />
+              <Sparkles className="w-3.5 h-3.5" />
               <span>Generate Certificates</span>
             </Link>
           </div>
         }
       />
 
-      {/* KPI Metric Cards Grid with Single-Run Viewport Counter */}
+      {/* KPI Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        <MetricCard label="Total Events" value={events.length} icon={Calendar} color="blue" />
-        <MetricCard label="Recipients" value={totalRecipients} icon={Users} color="teal" />
-        <MetricCard label="Certificates" value={certificates.length} icon={FileCheck} color="indigo" />
-        <MetricCard label="Valid Credentials" value={validCertsCount} icon={ShieldCheck} color="emerald" />
-        <MetricCard label="Revoked Records" value={revokedCertsCount} icon={ShieldAlert} color="rose" />
+        <MetricCard label="Total Events"      value={events.length}       icon={Calendar}    color="blue" />
+        <MetricCard label="Recipients"        value={totalRecipients}     icon={Users}       color="teal" />
+        <MetricCard label="Certificates"      value={certificates.length} icon={FileCheck}   color="indigo" />
+        <MetricCard label="Valid Credentials" value={validCertsCount}     icon={ShieldCheck} color="emerald" />
+        <MetricCard label="Revoked Records"   value={revokedCertsCount}   icon={ShieldAlert} color="rose" />
       </div>
 
-      {/* Quick Actions Bar */}
-      <div className="bg-white border border-slate-200 p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4 shadow-xs">
-        <span className="text-xs font-semibold text-slate-700">Quick Actions</span>
-        <div className="flex flex-wrap items-center gap-3 text-xs">
-          <Link
-            href="/events/new"
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 transition font-medium"
-          >
-            <PlusCircle className="w-3.5 h-3.5 text-blue-600" />
-            <span>New Event</span>
-          </Link>
-          <Link
-            href="/organization"
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 transition font-medium"
-          >
-            <Building2 className="w-3.5 h-3.5 text-teal-600" />
-            <span>Organization Branding</span>
-          </Link>
-          <Link
-            href="/templates"
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 transition font-medium"
-          >
-            <FileSpreadsheet className="w-3.5 h-3.5 text-indigo-600" />
-            <span>Showcase Templates</span>
-          </Link>
-          <Link
-            href="/certificates"
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 transition font-medium"
-          >
-            <FileCheck className="w-3.5 h-3.5 text-amber-600" />
-            <span>Audit History</span>
-          </Link>
+      {/* Quick Actions */}
+      <div
+        className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl border"
+        style={{
+          backgroundColor: 'var(--surface)',
+          borderColor: 'var(--border)',
+          boxShadow: 'var(--shadow-xs)',
+        }}
+      >
+        <span className="text-xs font-bold tracking-wide" style={{ color: 'var(--text-muted)' }}>
+          QUICK ACTIONS
+        </span>
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          {[
+            { href: '/events/new',  icon: PlusCircle,    label: 'New Event',          color: 'var(--primary)' },
+            { href: '/templates',   icon: FileSpreadsheet, label: 'Templates',         color: 'var(--info)' },
+            { href: '/certificates', icon: FileCheck,    label: 'Audit History',      color: 'var(--warning)' },
+            { href: '/studio',      icon: Layers,        label: 'Certificate Studio', color: 'var(--success)' },
+          ].map((action) => {
+            const Icon = action.icon;
+            return (
+              <Link
+                key={action.href}
+                href={action.href}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all font-medium"
+                style={{
+                  backgroundColor: 'var(--surface-subtle)',
+                  borderColor: 'var(--border)',
+                  color: 'var(--text-secondary)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--primary-light)';
+                  e.currentTarget.style.borderColor = 'var(--primary-border)';
+                  e.currentTarget.style.color = 'var(--primary)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-subtle)';
+                  e.currentTarget.style.borderColor = 'var(--border)';
+                  e.currentTarget.style.color = 'var(--text-secondary)';
+                }}
+              >
+                <Icon className="w-3.5 h-3.5" style={{ color: action.color }} />
+                <span>{action.label}</span>
+              </Link>
+            );
+          })}
         </div>
       </div>
 
-      {/* Main Content Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column: Recent Events */}
-        <div className="lg:col-span-2 space-y-4">
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        {/* ── Left: Recent Events ── */}
+        <div className="lg:col-span-2 space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-slate-900 tracking-tight">Recent Programs & Workshops</h2>
-            <Link href="/events" className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1">
-              <span>View All Events</span>
+            <h2 className="text-sm font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
+              Recent Programs & Workshops
+            </h2>
+            <Link
+              href="/events"
+              className="text-xs font-semibold flex items-center gap-1 transition-colors"
+              style={{ color: 'var(--primary)' }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--primary-hover)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--primary)'; }}
+            >
+              <span>View All</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {recentEvents.length > 0 ? (
-              recentEvents.map((evt) => (
+              recentEvents.map((evt, i) => (
                 <motion.div
                   key={evt.id}
-                  whileHover={{ x: 2, transition: { duration: 0.15 } }}
-                  className="bg-white border border-slate-200 hover:border-slate-300 p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition shadow-xs"
+                  initial={{ opacity: 0, x: -4 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.2, delay: i * 0.05 }}
+                  className="group rounded-2xl border p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all"
+                  style={{
+                    backgroundColor: 'var(--surface)',
+                    borderColor: 'var(--border)',
+                    boxShadow: 'var(--shadow-xs)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--border-strong)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--border)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-xs)';
+                  }}
                 >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-50 text-blue-700 border border-blue-200">
+                  <div className="space-y-1.5 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span
+                        className="px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border"
+                        style={{
+                          backgroundColor: 'var(--primary-light)',
+                          color: 'var(--primary)',
+                          borderColor: 'var(--primary-border)',
+                        }}
+                      >
                         {evt.eventType}
                       </span>
                       <StatusBadge status={evt.status} />
-                      <span className="text-xs text-slate-500">{evt.startDate}</span>
+                      <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>
+                        {evt.startDate}
+                      </span>
                     </div>
-                    <h3 className="font-bold text-slate-900 text-sm">{evt.name}</h3>
-                    <p className="text-xs text-slate-600 line-clamp-1">{evt.description}</p>
+                    <h3 className="font-bold text-sm truncate" style={{ color: 'var(--text-primary)' }}>
+                      {evt.name}
+                    </h3>
+                    <p className="text-xs line-clamp-1" style={{ color: 'var(--text-muted)' }}>
+                      {evt.description}
+                    </p>
                   </div>
 
                   <Link
                     href={`/events/${evt.id}`}
-                    className="shrink-0 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 px-3.5 py-2 rounded-lg border border-slate-200 transition"
+                    className="shrink-0 text-xs font-semibold py-1.5 px-3.5 rounded-xl border transition-all whitespace-nowrap"
+                    style={{
+                      backgroundColor: 'var(--surface-subtle)',
+                      borderColor: 'var(--border)',
+                      color: 'var(--text-secondary)',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--primary-light)';
+                      e.currentTarget.style.borderColor = 'var(--primary-border)';
+                      e.currentTarget.style.color = 'var(--primary)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--surface-subtle)';
+                      e.currentTarget.style.borderColor = 'var(--border)';
+                      e.currentTarget.style.color = 'var(--text-secondary)';
+                    }}
                   >
-                    Manage Event
+                    Manage →
                   </Link>
                 </motion.div>
               ))
@@ -169,9 +261,19 @@ export default function DashboardPage() {
                 action={
                   <Link
                     href="/events/new"
-                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-lg text-xs shadow-xs"
+                    className="inline-flex items-center gap-2 text-white font-bold py-2 px-4 rounded-xl text-xs transition-all"
+                    style={{
+                      backgroundColor: 'var(--primary)',
+                      boxShadow: 'var(--shadow-sm)',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--primary-hover)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--primary)';
+                    }}
                   >
-                    <PlusCircle className="w-4 h-4" />
+                    <PlusCircle className="w-3.5 h-3.5" />
                     <span>Create Event</span>
                   </Link>
                 }
@@ -180,38 +282,80 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Right Column: Recently Issued Certificates */}
-        <div className="space-y-4">
+        {/* ── Right: Recent Certificates ── */}
+        <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-slate-900 tracking-tight">Issued Credentials</h2>
-            <Link href="/certificates" className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1">
-              <span>View History</span>
+            <h2 className="text-sm font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
+              Issued Credentials
+            </h2>
+            <Link
+              href="/certificates"
+              className="text-xs font-semibold flex items-center gap-1 transition-colors"
+              style={{ color: 'var(--primary)' }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--primary-hover)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--primary)'; }}
+            >
+              <span>History</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-2xl p-4 space-y-3 shadow-xs">
+          <div
+            className="rounded-2xl border overflow-hidden"
+            style={{
+              backgroundColor: 'var(--surface)',
+              borderColor: 'var(--border)',
+              boxShadow: 'var(--shadow-sm)',
+            }}
+          >
             {recentCertificates.length > 0 ? (
-              recentCertificates.map((cert) => (
-                <div key={cert.id} className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3 text-xs">
-                  <div>
-                    <p className="font-bold text-slate-900">{cert.recipientSnapshot.fullName}</p>
-                    <p className="text-[10px] text-slate-500 font-mono mt-0.5">{cert.certificateCode}</p>
-                  </div>
+              <div className="divide-y" style={{ borderColor: 'var(--border-subtle)' }}>
+                {recentCertificates.map((cert) => (
+                  <div
+                    key={cert.id}
+                    className="p-3.5 flex items-center justify-between gap-3 text-xs transition-colors"
+                    style={{ '--border-subtle': 'var(--border)' } as React.CSSProperties}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '';
+                    }}
+                  >
+                    <div className="min-w-0">
+                      <p className="font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
+                        {cert.recipientSnapshot.fullName}
+                      </p>
+                      <p
+                        className="text-[10px] font-mono mt-0.5 truncate"
+                        style={{ color: 'var(--text-muted)' }}
+                      >
+                        {cert.certificateCode}
+                      </p>
+                    </div>
 
-                  <div className="text-right">
-                    <StatusBadge status={cert.status} />
-                    <Link
-                      href={`/certificates/${cert.id}`}
-                      className="block text-[10px] font-semibold text-blue-600 hover:underline mt-1"
-                    >
-                      Details →
-                    </Link>
+                    <div className="text-right shrink-0 space-y-1">
+                      <StatusBadge status={cert.status} />
+                      <Link
+                        href={`/certificates/${cert.id}`}
+                        className="block text-[10px] font-semibold transition-colors"
+                        style={{ color: 'var(--primary)' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--primary-hover)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--primary)'; }}
+                      >
+                        View →
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              ))
+                ))}
+              </div>
             ) : (
-              <p className="text-xs text-slate-500 text-center py-8">No certificates generated yet.</p>
+              <p
+                className="text-xs text-center py-10"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                No certificates generated yet.
+              </p>
             )}
           </div>
         </div>

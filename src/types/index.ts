@@ -51,6 +51,12 @@ export interface EventItem {
   updatedAt: string;
 }
 
+export type ParticipantCategory =
+  | 'winner'
+  | 'runner'
+  | 'participant'
+  | string;
+
 export interface Recipient {
   id: string;
   eventId: string;
@@ -60,8 +66,19 @@ export interface Recipient {
   department?: string;
   course?: string;
   achievement?: string;
+  category?: ParticipantCategory;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Participant {
+  id: string;
+  name: string;
+  email: string;
+  department: string;
+  registrationNumber: string;
+  category: ParticipantCategory;
+  selected: boolean;
 }
 
 export type TemplateId = 'modern-blue' | 'classic-gold' | 'minimal-green' | 'academic-maroon';
@@ -103,6 +120,7 @@ export interface CSVRecipientRow {
   department?: string;
   course?: string;
   achievement?: string;
+  category?: string;
   isValid: boolean;
   error?: string;
   isDuplicate?: boolean;

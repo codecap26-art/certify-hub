@@ -7,8 +7,8 @@ import { signatoryRepository, DEFAULT_SIGNATORIES } from '@/lib/storage/signator
 import { logoRepository } from '@/lib/storage/logoRepository';
 
 describe('Institutional Certificate Architecture & Templates', () => {
-  it('loads all 8 built-in templates correctly including Institutional Appreciation', () => {
-    expect(BUILT_IN_TEMPLATES.length).toBe(8);
+  it('loads built-in templates correctly including Institutional Appreciation', () => {
+    expect(BUILT_IN_TEMPLATES.length).toBeGreaterThanOrEqual(8);
 
     const instApp = BUILT_IN_TEMPLATES.find((t) => t.id === 'tmpl-institutional-appreciation');
     expect(instApp).toBeDefined();

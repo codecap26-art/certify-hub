@@ -17,6 +17,14 @@ import { ClassicGoldTemplate } from './ClassicGoldTemplate';
 import { MinimalGreenTemplate } from './MinimalGreenTemplate';
 import { AcademicMaroonTemplate } from './AcademicMaroonTemplate';
 import { organizationRepository } from '@/lib/storage/organizationRepository';
+import {
+  getNormalizedCategory,
+  getCertificateCategoryTitle,
+  getCertificateMainTitle,
+  getCertificateRoleLabel,
+  getCertificateRankLabel,
+  getCategoryDisplayTitle,
+} from '@/lib/participantUtils';
 
 // SSR-disabled Konva canvas stage for dynamic document rendering
 const CanvasStage = dynamic(
@@ -161,6 +169,12 @@ export const CertificateRenderer: React.FC<Props> = ({ certificate, templateId, 
     const docWidth = currentTemplate.width || (isPortrait ? 595 : 842);
     const docHeight = currentTemplate.height || (isPortrait ? 842 : 595);
 
+    const recCat = getNormalizedCategory(mergedCertificate.recipientSnapshot || {});
+    const catTitle = getCertificateCategoryTitle(recCat, mergedCertificate.eventSnapshot?.certificateType);
+    const catMainTitle = getCertificateMainTitle(recCat, mergedCertificate.eventSnapshot?.certificateType);
+    const catRole = getCertificateRoleLabel(recCat, mergedCertificate.recipientSnapshot?.achievement);
+    const catRank = getCertificateRankLabel(recCat, mergedCertificate.recipientSnapshot?.achievement);
+
     // Compute sample dynamic binding values for on-screen live preview
     const sampleData: Record<string, string> = {
       '{{recipient.name}}': mergedCertificate.recipientSnapshot?.fullName || 'SUBASH P',
@@ -168,8 +182,10 @@ export const CertificateRenderer: React.FC<Props> = ({ certificate, templateId, 
       '{{recipient.registrationNumber}}': mergedCertificate.recipientSnapshot?.registrationNumber || '23CS101',
       '{{recipient.department}}': mergedCertificate.recipientSnapshot?.department || 'Computer Science & Engineering',
       '{{recipient.course}}': mergedCertificate.recipientSnapshot?.course || mergedCertificate.eventSnapshot?.name || 'React Development Workshop',
-      '{{recipient.achievement}}': mergedCertificate.recipientSnapshot?.achievement || 'Participant',
-      '{{recipient.rank}}': mergedCertificate.recipientSnapshot?.achievement || '1st Place',
+      '{{recipient.achievement}}': catRole,
+      '{{recipient.category}}': getCategoryDisplayTitle(recCat),
+      '{{recipient.role}}': catRole,
+      '{{recipient.rank}}': catRank,
 
       '{{organization.name}}': mergedCertificate.organizationSnapshot?.name || 'ABC ENGINEERING COLLEGE',
       '{{organization.address}}': mergedCertificate.organizationSnapshot?.address || 'Autonomous Institution Affiliated to State University',
@@ -187,7 +203,8 @@ export const CertificateRenderer: React.FC<Props> = ({ certificate, templateId, 
       '{{event.dateRange}}': mergedCertificate.eventSnapshot?.startDate ? `${mergedCertificate.eventSnapshot.startDate} - ${mergedCertificate.eventSnapshot.endDate}` : 'March 10-12, 2026',
       '{{event.date}}': mergedCertificate.eventSnapshot?.startDate || '2026-03-12',
 
-      '{{certificate.type}}': mergedCertificate.eventSnapshot?.certificateType ? `OF ${mergedCertificate.eventSnapshot.certificateType.toUpperCase()}` : 'OF PARTICIPATION',
+      '{{certificate.type}}': catTitle.toUpperCase().replace(/^CERTIFICATE\s+/, ''),
+      '{{certificate.title}}': catMainTitle,
       '{{certificate.issueDate}}': mergedCertificate.generatedAt ? mergedCertificate.generatedAt.slice(0, 10) : '2026-03-12',
       '{{certificate.code}}': mergedCertificate.certificateCode || 'ABC-REACT-2026-0001',
       '{{certificate.verificationUrl}}': mergedCertificate.verificationToken ? `${typeof window !== 'undefined' ? window.location.origin : ''}/verify/${mergedCertificate.verificationToken}` : '',

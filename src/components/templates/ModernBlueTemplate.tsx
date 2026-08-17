@@ -1,5 +1,10 @@
 import React from 'react';
 import { CertificateRecord } from '@/types';
+import {
+  getNormalizedCategory,
+  getCertificateCategoryTitle,
+  getCertificateRoleLabel,
+} from '@/lib/participantUtils';
 
 interface TemplateProps {
   certificate: Partial<CertificateRecord>;
@@ -10,6 +15,11 @@ export const ModernBlueTemplate: React.FC<TemplateProps> = ({ certificate, qrCod
   const org = certificate.organizationSnapshot;
   const event = certificate.eventSnapshot;
   const recipient = certificate.recipientSnapshot;
+  const category = getNormalizedCategory(recipient || {});
+  const certCategoryTitle = getCertificateCategoryTitle(category, event?.certificateType);
+  const roleLabel = getCertificateRoleLabel(category, recipient?.achievement);
+  const isWinner = category === 'winner';
+  const isRunner = category === 'runner';
 
   return (
     <div
@@ -56,7 +66,7 @@ export const ModernBlueTemplate: React.FC<TemplateProps> = ({ certificate, qrCod
       {/* Body Content */}
       <div className="relative z-10 text-center my-auto py-4">
         <p className="text-sm font-semibold tracking-[0.2em] text-teal-400 uppercase mb-2">
-          Certificate of {event?.certificateType || 'Achievement'}
+          {certCategoryTitle}
         </p>
 
         <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight mb-4">
@@ -71,11 +81,27 @@ export const ModernBlueTemplate: React.FC<TemplateProps> = ({ certificate, qrCod
         </div>
 
         <p className="text-xs md:text-sm text-slate-300 max-w-2xl mx-auto leading-relaxed">
-          For successful participation and completion of{' '}
+          {isWinner
+            ? `For exceptional accomplishment and winning First Place distinction in `
+            : isRunner
+            ? `For outstanding performance and securing Runner-Up distinction in `
+            : `For successful participation and completion of `}
           <span className="font-bold text-white">{event?.name || 'Event Title'}</span>
           {event?.startDate && ` held from ${event.startDate}${event.endDate ? ` to ${event.endDate}` : ''}`}.
-          {recipient?.achievement && recipient.achievement !== 'Participant' && (
-            <span className="block mt-1 font-semibold text-teal-300">Honored with: {recipient.achievement}</span>
+          {isWinner && (
+            <span className="block mt-2 font-bold text-amber-400 text-sm">
+              🏆 Distinction Awarded: {roleLabel}
+            </span>
+          )}
+          {isRunner && (
+            <span className="block mt-2 font-bold text-purple-300 text-sm">
+              🥈 Distinction Awarded: {roleLabel}
+            </span>
+          )}
+          {!isWinner && !isRunner && recipient?.achievement && recipient.achievement !== 'Participant' && (
+            <span className="block mt-2 font-semibold text-teal-300">
+              Special Mention: {recipient.achievement}
+            </span>
           )}
         </p>
       </div>

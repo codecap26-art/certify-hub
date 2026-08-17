@@ -76,73 +76,158 @@ export function DataTable<T extends { id: string }>({
   };
 
   return (
-    <div className="space-y-4">
-      {/* Search & Filter Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white border border-slate-200 p-3.5 rounded-2xl shadow-xs">
+    <div className="space-y-3">
+      {/* ── Search & Filter Bar ── */}
+      <div
+        className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 rounded-2xl border"
+        style={{
+          backgroundColor: 'var(--surface)',
+          borderColor: 'var(--border)',
+          boxShadow: 'var(--shadow-xs)',
+        }}
+      >
         {searchKey && (
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search
+              className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+              style={{ color: 'var(--text-muted)' }}
+            />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder={searchPlaceholder}
-              className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="w-full pl-10 pr-4 py-2 rounded-xl border text-xs transition-all"
+              style={{
+                backgroundColor: 'var(--surface-subtle)',
+                borderColor: 'var(--border)',
+                color: 'var(--text-primary)',
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--primary)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-focus)';
+                e.currentTarget.style.outline = 'none';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border)';
+                e.currentTarget.style.boxShadow = '';
+              }}
             />
           </div>
         )}
 
-        {filterKey && filterOptions.length > 0 && (
-          <div className="flex items-center gap-2">
-            <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-            <select
-              value={filterValue}
-              onChange={(e) => setFilterValue(e.target.value)}
-              className="bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-xl px-3 py-2 focus:outline-none focus:border-blue-500"
-            >
-              <option value="ALL">All Statuses</option>
-              {filterOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {filterKey && filterOptions.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Filter className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--text-muted)' }} />
+              <select
+                value={filterValue}
+                onChange={(e) => setFilterValue(e.target.value)}
+                className="text-xs px-3 py-2 rounded-xl border transition-all"
+                style={{
+                  backgroundColor: 'var(--surface-subtle)',
+                  borderColor: 'var(--border)',
+                  color: 'var(--text-secondary)',
+                  outline: 'none',
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--primary)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border)';
+                }}
+              >
+                <option value="ALL">All Statuses</option>
+                {filterOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
-        <span className="text-[11px] font-semibold text-slate-500 self-center px-2">
-          {sortedData.length} {sortedData.length === 1 ? 'record' : 'records'}
-        </span>
+          <span
+            className="text-[11px] font-semibold px-2.5 py-1 rounded-lg border"
+            style={{
+              color: 'var(--text-muted)',
+              backgroundColor: 'var(--surface-subtle)',
+              borderColor: 'var(--border)',
+            }}
+          >
+            {sortedData.length} {sortedData.length === 1 ? 'record' : 'records'}
+          </span>
+        </div>
       </div>
 
-      {/* Desktop Table View */}
-      <div className="hidden md:block bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+      {/* ── Desktop Table ── */}
+      <div
+        className="hidden md:block rounded-2xl border overflow-hidden"
+        style={{
+          backgroundColor: 'var(--surface)',
+          borderColor: 'var(--border)',
+          boxShadow: 'var(--shadow-sm)',
+        }}
+      >
         {sortedData.length > 0 ? (
-          <table className="w-full text-left border-collapse text-xs">
+          <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase tracking-wider text-[10px]">
+              <tr
+                className="border-b"
+                style={{
+                  backgroundColor: 'var(--surface-subtle)',
+                  borderColor: 'var(--border)',
+                }}
+              >
                 {columns.map((col) => (
                   <th
                     key={col.key}
                     onClick={() => col.sortable && handleSort(col.key)}
-                    className={`py-3.5 px-4 ${col.sortable ? 'cursor-pointer hover:text-slate-900 select-none' : ''}`}
+                    className={`py-3 px-4 text-[10px] font-bold uppercase tracking-widest ${
+                      col.sortable ? 'cursor-pointer select-none' : ''
+                    }`}
+                    style={{ color: 'var(--text-muted)' }}
+                    onMouseEnter={(e) => {
+                      if (col.sortable) e.currentTarget.style.color = 'var(--text-primary)';
+                    }}
+                    onMouseLeave={(e) => {
+                      if (col.sortable) e.currentTarget.style.color = 'var(--text-muted)';
+                    }}
                   >
                     <div className="flex items-center gap-1.5">
                       <span>{col.header}</span>
                       {col.sortable && sortKey === col.key && (
-                        <span>{sortOrder === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}</span>
+                        <span style={{ color: 'var(--primary)' }}>
+                          {sortOrder === 'asc' ? (
+                            <ChevronUp className="w-3.5 h-3.5" />
+                          ) : (
+                            <ChevronDown className="w-3.5 h-3.5" />
+                          )}
+                        </span>
                       )}
                     </div>
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-700">
-              {sortedData.map((item) => (
+            <tbody>
+              {sortedData.map((item, idx) => (
                 <tr
                   key={item.id}
                   onClick={() => onRowClick && onRowClick(item)}
-                  className={`transition hover:bg-slate-50/80 ${onRowClick ? 'cursor-pointer' : ''}`}
+                  className={`border-b last:border-b-0 text-xs transition-colors duration-100 ${
+                    onRowClick ? 'cursor-pointer' : ''
+                  }`}
+                  style={{
+                    borderColor: 'var(--border-subtle)',
+                    color: 'var(--text-secondary)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '';
+                  }}
                 >
                   {columns.map((col) => (
                     <td key={col.key} className="py-3.5 px-4">
@@ -160,23 +245,41 @@ export function DataTable<T extends { id: string }>({
         )}
       </div>
 
-      {/* Mobile Card List View */}
-      <div className="md:hidden space-y-3">
+      {/* ── Mobile Card View ── */}
+      <div className="md:hidden space-y-2.5">
         {sortedData.length > 0 ? (
           sortedData.map((item) => (
             <div
               key={item.id}
               onClick={() => onRowClick && onRowClick(item)}
-              className={`bg-white border border-slate-200 p-4 rounded-2xl space-y-2.5 shadow-xs ${
-                onRowClick ? 'cursor-pointer hover:border-slate-300' : ''
+              className={`p-4 rounded-2xl border space-y-3 transition-all ${
+                onRowClick ? 'cursor-pointer' : ''
               }`}
+              style={{
+                backgroundColor: 'var(--surface)',
+                borderColor: 'var(--border)',
+                boxShadow: 'var(--shadow-xs)',
+              }}
+              onMouseEnter={(e) => {
+                if (onRowClick) {
+                  e.currentTarget.style.borderColor = 'var(--border-strong)';
+                  e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-xs)';
+              }}
             >
               {columns.map((col) => (
-                <div key={col.key} className="flex justify-between items-center text-xs">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <div key={col.key} className="flex justify-between items-center gap-4 text-xs">
+                  <span
+                    className="text-[10px] font-bold uppercase tracking-widest shrink-0"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
                     {col.header}
                   </span>
-                  <span className="text-right text-slate-800">
+                  <span className="text-right" style={{ color: 'var(--text-primary)' }}>
                     {col.render
                       ? col.render(item)
                       : String((item as Record<string, unknown>)[col.key] || '')}

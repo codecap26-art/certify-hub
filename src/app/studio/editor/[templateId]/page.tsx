@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, use } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { CustomTemplate } from '@/types/template';
 import { templateRepository } from '@/lib/storage/templateRepository';
 import { EditorContainer } from '@/components/editor/EditorContainer';
@@ -15,6 +15,9 @@ interface Props {
 export default function StudioEditorRoute({ params }: Props) {
   const { templateId } = use(params);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromParam = searchParams.get('from');
+  const eventId = searchParams.get('eventId');
 
   const [template, setTemplate] = useState<CustomTemplate | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -56,12 +59,21 @@ export default function StudioEditorRoute({ params }: Props) {
     );
   }
 
+  const handleExit = () => {
+    if (fromParam === 'generate') {
+      const url = eventId ? `/generate?eventId=${eventId}&templateId=${template.id}` : `/generate?templateId=${template.id}`;
+      router.push(url);
+    } else if (fromParam === 'templates') {
+      router.push('/templates');
+    } else {
+      router.push('/studio');
+    }
+  };
+
   return (
     <EditorContainer
       initialTemplate={template}
-      onExit={() => {
-        router.push('/studio');
-      }}
+      onExit={handleExit}
     />
   );
 }

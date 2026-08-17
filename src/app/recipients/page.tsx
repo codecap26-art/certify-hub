@@ -8,6 +8,8 @@ import { recipientRepository } from '@/lib/storage/recipientRepository';
 import { eventRepository } from '@/lib/storage/eventRepository';
 import { PageHeader } from '@/components/ui/PageHeader';
 
+import { getNormalizedCategory, getCategoryBadgeStyle, getCategoryDisplayTitle } from '@/lib/participantUtils';
+
 export default function RecipientsPage() {
   const [recipients, setRecipients] = useState<Recipient[]>([]);
   const [events, setEvents] = useState<EventItem[]>([]);
@@ -93,39 +95,51 @@ export default function RecipientsPage() {
                   <th className="py-3 px-4">Reg / Roll No</th>
                   <th className="py-3 px-4">Contact Email</th>
                   <th className="py-3 px-4">Department / Program</th>
+                  <th className="py-3 px-4">Role / Status</th>
                   <th className="py-3 px-4">Event</th>
                   <th className="py-3 px-4 text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filteredRecipients.map((rec) => (
-                  <tr key={rec.id} className="hover:bg-slate-50/80 transition">
-                    <td className="py-3 px-4 font-bold text-slate-900">{rec.fullName}</td>
-                    <td className="py-3 px-4 font-mono text-slate-600">{rec.registrationNumber || '-'}</td>
-                    <td className="py-3 px-4 text-slate-600">
-                      <div className="flex items-center gap-1.5">
-                        <Mail className="w-3 h-3 text-slate-400" />
-                        <span>{rec.email}</span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4 text-slate-600">{rec.department || rec.course || '-'}</td>
-                    <td className="py-3 px-4">
-                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md">
-                        <Calendar className="w-3 h-3 text-slate-400" />
-                        <span className="truncate max-w-[150px]">{getEventName(rec.eventId)}</span>
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <Link
-                        href={`/generate?eventId=${rec.eventId}`}
-                        className="text-blue-600 hover:text-blue-800 font-semibold flex items-center justify-end gap-1"
-                      >
-                        <span>Issue Cert</span>
-                        <ArrowRight className="w-3 h-3" />
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
+                {filteredRecipients.map((rec) => {
+                  const cat = getNormalizedCategory(rec);
+                  const style = getCategoryBadgeStyle(cat);
+                  const display = getCategoryDisplayTitle(cat);
+
+                  return (
+                    <tr key={rec.id} className="hover:bg-slate-50/80 transition">
+                      <td className="py-3 px-4 font-bold text-slate-900">{rec.fullName}</td>
+                      <td className="py-3 px-4 font-mono text-slate-600">{rec.registrationNumber || '-'}</td>
+                      <td className="py-3 px-4 text-slate-600">
+                        <div className="flex items-center gap-1.5">
+                          <Mail className="w-3 h-3 text-slate-400" />
+                          <span>{rec.email}</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-slate-600">{rec.department || rec.course || '-'}</td>
+                      <td className="py-3 px-4">
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${style.bg} ${style.text} ${style.border}`}>
+                          {cat === 'participant' ? 'Participated' : display}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md">
+                          <Calendar className="w-3 h-3 text-slate-400" />
+                          <span className="truncate max-w-[150px]">{getEventName(rec.eventId)}</span>
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <Link
+                          href={`/generate?eventId=${rec.eventId}`}
+                          className="text-blue-600 hover:text-blue-800 font-semibold flex items-center justify-end gap-1"
+                        >
+                          <span>Issue Cert</span>
+                          <ArrowRight className="w-3 h-3" />
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

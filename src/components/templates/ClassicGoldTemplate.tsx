@@ -1,5 +1,11 @@
 import React from 'react';
 import { CertificateRecord } from '@/types';
+import {
+  getNormalizedCategory,
+  getCertificateCategoryTitle,
+  getCertificateMainTitle,
+  getCertificateRoleLabel,
+} from '@/lib/participantUtils';
 
 interface TemplateProps {
   certificate: Partial<CertificateRecord>;
@@ -10,6 +16,12 @@ export const ClassicGoldTemplate: React.FC<TemplateProps> = ({ certificate, qrCo
   const org = certificate.organizationSnapshot;
   const event = certificate.eventSnapshot;
   const recipient = certificate.recipientSnapshot;
+  const category = getNormalizedCategory(recipient || {});
+  const certCategoryTitle = getCertificateCategoryTitle(category, event?.certificateType);
+  const certMainTitle = getCertificateMainTitle(category, event?.certificateType);
+  const roleLabel = getCertificateRoleLabel(category, recipient?.achievement);
+  const isWinner = category === 'winner';
+  const isRunner = category === 'runner';
 
   return (
     <div
@@ -52,11 +64,11 @@ export const ClassicGoldTemplate: React.FC<TemplateProps> = ({ certificate, qrCo
       {/* Body Content */}
       <div className="relative z-10 text-center my-auto py-3">
         <p className="text-xs font-bold tracking-[0.25em] text-amber-700 uppercase mb-1">
-          Official Certificate of {event?.certificateType || 'Achievement'}
+          Official {certCategoryTitle}
         </p>
 
         <h1 className="text-3xl md:text-4xl font-extrabold text-amber-950 tracking-tight font-serif uppercase my-2">
-          Certificate of Excellence
+          {certMainTitle}
         </h1>
 
         <p className="text-xs text-amber-900 italic my-2">This is to certify that</p>
@@ -68,10 +80,24 @@ export const ClassicGoldTemplate: React.FC<TemplateProps> = ({ certificate, qrCo
         </div>
 
         <p className="text-xs md:text-sm text-amber-900/90 max-w-2xl mx-auto leading-relaxed mt-3">
-          has successfully fulfilled all requirements and participated in{' '}
+          {isWinner
+            ? `has demonstrated exceptional mastery and secured First Place distinction in `
+            : isRunner
+            ? `has demonstrated outstanding skill and secured Runner-Up distinction in `
+            : `has successfully fulfilled all requirements and participated in `}
           <span className="font-bold text-amber-950">{event?.name || 'Event Title'}</span>
           {event?.startDate && ` held on ${event.startDate}`}.
-          {recipient?.achievement && recipient.achievement !== 'Participant' && (
+          {isWinner && (
+            <span className="block mt-2 font-bold text-amber-800 text-sm">
+              🏆 Awarded Distinction: {roleLabel}
+            </span>
+          )}
+          {isRunner && (
+            <span className="block mt-2 font-bold text-purple-800 text-sm">
+              🥈 Awarded Distinction: {roleLabel}
+            </span>
+          )}
+          {!isWinner && !isRunner && recipient?.achievement && recipient.achievement !== 'Participant' && (
             <span className="block mt-1 font-bold text-amber-800">Awarded: {recipient.achievement}</span>
           )}
         </p>

@@ -22,6 +22,11 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { DataTable, Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { parseRecipientCSV, generateSampleCSV } from '@/lib/csv/parser';
+import {
+  getNormalizedCategory,
+  getCategoryBadgeStyle,
+  getCategoryDisplayTitle,
+} from '@/lib/participantUtils';
 
 export default function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -38,6 +43,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   const [newRecEmail, setNewRecEmail] = useState('');
   const [newRecRegNum, setNewRecRegNum] = useState('');
   const [newRecDept, setNewRecDept] = useState('');
+  const [newRecCategory, setNewRecCategory] = useState<'winner' | 'runner' | 'participant'>('participant');
 
   // CSV Import Modal
   const [showCsvModal, setShowCsvModal] = useState(false);
@@ -80,6 +86,10 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
     e.preventDefault();
     if (!newRecName.trim()) return;
 
+    let achievement = 'Participant';
+    if (newRecCategory === 'winner') achievement = 'Winner';
+    if (newRecCategory === 'runner') achievement = 'Runner';
+
     const newRec: Recipient = {
       id: `rec-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       eventId: event.id,
@@ -87,6 +97,8 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
       email: newRecEmail.trim() || 'student@example.com',
       registrationNumber: newRecRegNum.trim(),
       department: newRecDept.trim(),
+      category: newRecCategory,
+      achievement,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -97,6 +109,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
     setNewRecEmail('');
     setNewRecRegNum('');
     setNewRecDept('');
+    setNewRecCategory('participant');
     setShowAddRecipientModal(false);
   };
 
@@ -164,6 +177,21 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
       header: 'Department',
       sortable: true,
       render: (r) => <span className="text-xs text-slate-700">{r.department || 'N/A'}</span>,
+    },
+    {
+      key: 'category',
+      header: 'Role / Status',
+      sortable: true,
+      render: (r) => {
+        const cat = getNormalizedCategory(r);
+        const style = getCategoryBadgeStyle(cat);
+        const display = getCategoryDisplayTitle(cat);
+        return (
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${style.bg} ${style.text} ${style.border}`}>
+            {cat === 'participant' ? 'Participated' : display}
+          </span>
+        );
+      },
     },
   ];
 
@@ -291,6 +319,66 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                   className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-900 focus:outline-none focus:border-blue-500"
                   placeholder="e.g. Subash P"
                 />
+              </div>
+
+              {/* Recipient Category / Achievement Question Box */}
+              <div className="space-y-1.5 bg-slate-50 border border-slate-200 p-3 rounded-xl">
+                <label className="block font-bold text-slate-800" htmlFor="rec-category">
+                  Participant Role / Status *
+                </label>
+                <p className="text-[11px] text-slate-500 mb-2">
+                  Select whether this recipient is a Winner, Runner, or Participated:
+                </p>
+
+                <div className="grid grid-cols-3 gap-2 mb-2">
+                  <button
+                    type="button"
+                    onClick={() => setNewRecCategory('winner')}
+                    className={`p-2.5 rounded-xl border text-center font-bold text-xs transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+                      newRecCategory === 'winner'
+                        ? 'bg-[#FFFBEB] border-[#FCD34D] text-[#92400E] ring-2 ring-[#FCD34D]/50 shadow-xs'
+                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    <span className="text-base">🏆</span>
+                    <span>Winner</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setNewRecCategory('runner')}
+                    className={`p-2.5 rounded-xl border text-center font-bold text-xs transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+                      newRecCategory === 'runner'
+                        ? 'bg-[#F5F3FF] border-[#C4B5FD] text-[#5B21B6] ring-2 ring-[#C4B5FD]/50 shadow-xs'
+                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    <span className="text-base">🥈</span>
+                    <span>Runner</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setNewRecCategory('participant')}
+                    className={`p-2.5 rounded-xl border text-center font-bold text-xs transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+                      newRecCategory === 'participant'
+                        ? 'bg-[#ECFEFF] border-[#67E8F9] text-[#155E75] ring-2 ring-[#67E8F9]/50 shadow-xs'
+                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    <span className="text-base">📜</span>
+                    <span>Participated</span>
+                  </button>
+                </div>
+
+                <select
+                  id="rec-category"
+                  value={newRecCategory}
+                  onChange={(e) => setNewRecCategory(e.target.value as 'winner' | 'runner' | 'participant')}
+                  className="w-full bg-white border border-slate-200 rounded-lg p-2 text-slate-900 font-semibold focus:outline-none focus:border-blue-500 cursor-pointer"
+                >
+                  <option value="winner">Winner</option>
+                  <option value="runner">Runner</option>
+                  <option value="participant">Participated (Participant)</option>
+                </select>
               </div>
 
               <div>

@@ -20,7 +20,8 @@ export type ElementType =
   | 'qr'
   | 'certificate-code'
   | 'group'
-  | 'mask';
+  | 'mask'
+  | 'ornament';
 
 export type ShapeVariant =
   | 'rectangle'
@@ -31,7 +32,34 @@ export type ShapeVariant =
   | 'polygon'
   | 'star'
   | 'line'
-  | 'arrow';
+  | 'arrow'
+  | 'diamond'
+  | 'heart'
+  | 'badge'
+  | 'ribbon'
+  | 'seal'
+  | 'medal'
+  | 'hexagon'
+  | 'octagon';
+
+export type ImageMaskVariant =
+  | 'none'
+  | 'circle'
+  | 'rounded'
+  | 'square'
+  | 'hexagon'
+  | 'badge'
+  | 'star'
+  | 'seal';
+
+export type CornerOrnamentStyle =
+  | 'classic'
+  | 'luxury'
+  | 'minimal'
+  | 'geometric'
+  | 'academic'
+  | 'corporate'
+  | 'ornamental';
 
 export type DynamicBindingKey =
   | '{{recipient.name}}'
@@ -41,6 +69,7 @@ export type DynamicBindingKey =
   | '{{recipient.course}}'
   | '{{recipient.achievement}}'
   | '{{recipient.rank}}'
+  | '{{recipient.score}}'
   | '{{organization.name}}'
   | '{{organization.address}}'
   | '{{organization.affiliation}}'
@@ -81,13 +110,18 @@ export type DynamicBindingKey =
   | '{{signatory.6.name}}'
   | '{{signatory.6.designation}}'
   | '{{signatory.6.signature}}'
+  | '{{custom.department}}'
+  | '{{custom.college}}'
+  | '{{custom.mentor}}'
+  | '{{custom.duration}}'
   | '{{custom.projectTitle}}'
   | '{{custom.score}}'
   | '{{custom.teamName}}'
-  | '{{custom.awardCategory}}';
+  | '{{custom.awardCategory}}'
+  | string;
 
 export interface DynamicBindingOption {
-  key: DynamicBindingKey;
+  key: string;
   label: string;
   category: 'Recipient' | 'Organization' | 'Event' | 'Certificate' | 'Signatory' | 'Custom';
   sampleValue: string;
@@ -101,6 +135,7 @@ export const DYNAMIC_BINDING_OPTIONS: DynamicBindingOption[] = [
   { key: '{{recipient.course}}', label: 'Course / Program', category: 'Recipient', sampleValue: 'React 19 & Next.js App Router Workshop' },
   { key: '{{recipient.achievement}}', label: 'Achievement / Position', category: 'Recipient', sampleValue: 'First Place - Hackathon' },
   { key: '{{recipient.rank}}', label: 'Rank / Standing', category: 'Recipient', sampleValue: '1st Rank' },
+  { key: '{{recipient.score}}', label: 'Score / Percentage', category: 'Recipient', sampleValue: '98%' },
 
   { key: '{{organization.name}}', label: 'Organization Name', category: 'Organization', sampleValue: 'ABC ENGINEERING COLLEGE' },
   { key: '{{organization.address}}', label: 'Organization Address', category: 'Organization', sampleValue: '123 University Campus, Innovation Way' },
@@ -135,6 +170,9 @@ export const DYNAMIC_BINDING_OPTIONS: DynamicBindingOption[] = [
   { key: '{{signatory.6.name}}', label: 'Signatory 6 Name', category: 'Signatory', sampleValue: 'Dr. A. B. Roy' },
   { key: '{{signatory.6.designation}}', label: 'Signatory 6 Designation', category: 'Signatory', sampleValue: 'Chairman' },
 
+  { key: '{{custom.mentor}}', label: 'Custom: Mentor Name', category: 'Custom', sampleValue: 'Dr. Eleanor Vance' },
+  { key: '{{custom.duration}}', label: 'Custom: Duration', category: 'Custom', sampleValue: '40 Hours / 4 Weeks' },
+  { key: '{{custom.college}}', label: 'Custom: College / Institute', category: 'Custom', sampleValue: 'National Institute of Tech' },
   { key: '{{custom.projectTitle}}', label: 'Custom: Project Title', category: 'Custom', sampleValue: 'AI-Powered Certificate Studio' },
   { key: '{{custom.score}}', label: 'Custom: Score / Marks', category: 'Custom', sampleValue: '98/100' },
   { key: '{{custom.teamName}}', label: 'Custom: Team Name', category: 'Custom', sampleValue: 'Team CyberDevs' },
@@ -158,8 +196,22 @@ export interface TextStyleProps {
   letterSpacing?: number;
   lineHeight?: number;
   textTransform?: 'none' | 'uppercase' | 'lowercase' | 'capitalize';
-  textDecoration?: 'none' | 'underline';
+  textDecoration?: 'none' | 'underline' | 'line-through';
   maxWidth?: number;
+
+  // Advanced Text Effects
+  shadowColor?: string;
+  shadowBlur?: number;
+  shadowOffsetX?: number;
+  shadowOffsetY?: number;
+  stroke?: string;
+  strokeWidth?: number;
+  backgroundColor?: string;
+
+  // Auto-fit Engine
+  autoFit?: boolean;
+  minFontSize?: number;
+  maxFontSize?: number;
 }
 
 export interface ShapeStyleProps {
@@ -167,8 +219,18 @@ export interface ShapeStyleProps {
   fill: string;
   stroke: string;
   strokeWidth: number;
+  strokeStyle?: 'solid' | 'dashed' | 'dotted';
   cornerRadius?: number;
   points?: number; // for polygon/star
+  innerRadiusRatio?: number;
+
+  // Advanced Effects
+  shadowColor?: string;
+  shadowBlur?: number;
+  shadowOffsetX?: number;
+  shadowOffsetY?: number;
+  gradientType?: 'linear' | 'radial' | 'none';
+  gradientColors?: string[];
 }
 
 export interface ImageStyleProps {
@@ -182,6 +244,11 @@ export interface ImageStyleProps {
   cropY?: number;
   cropWidth?: number;
   cropHeight?: number;
+
+  // Mask & Border
+  maskShape?: ImageMaskVariant;
+  borderWidth?: number;
+  borderColor?: string;
 }
 
 export interface QrStyleProps {
@@ -192,11 +259,13 @@ export interface QrStyleProps {
 }
 
 export interface BorderStyleProps {
-  borderType: 'solid' | 'dashed' | 'dotted' | 'double' | 'ornate';
+  borderType: 'solid' | 'dashed' | 'dotted' | 'double' | 'ornate' | 'modern' | 'minimal';
   color: string;
   width: number;
   cornerRadius?: number;
   padding?: number;
+  inset?: number;
+  opacity?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -217,6 +286,11 @@ export interface DocumentElement {
   visible: boolean;
   locked: boolean;
   groupId?: string;
+  aspectRatioLocked?: boolean;
+
+  // Centralized style and metadata
+  style?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
 
   // Type-specific style
   textValue?: string;
@@ -227,9 +301,18 @@ export interface DocumentElement {
   borderStyle?: BorderStyleProps;
 
   // Dynamic binding
-  dynamicBinding?: DynamicBindingKey;
+  dynamicBinding?: string;
   fallbackValue?: string;
 }
+
+export const CANVAS_PRESETS = [
+  { name: 'A4 Landscape', width: 842, height: 595, orientation: 'landscape' as const },
+  { name: 'A4 Portrait', width: 595, height: 842, orientation: 'portrait' as const },
+  { name: 'Letter Landscape', width: 792, height: 612, orientation: 'landscape' as const },
+  { name: 'Letter Portrait', width: 612, height: 792, orientation: 'portrait' as const },
+  { name: 'A5 Landscape', width: 595, height: 420, orientation: 'landscape' as const },
+  { name: 'Custom Size', width: 842, height: 595, orientation: 'landscape' as const },
+] as const;
 
 // ---------------------------------------------------------------------------
 // Guide
@@ -258,10 +341,64 @@ export interface BrandSettings {
 }
 
 // ---------------------------------------------------------------------------
+// Background Pattern & Gradient Configuration
+// ---------------------------------------------------------------------------
+export interface BackgroundGradient {
+  type: 'linear' | 'radial' | 'none';
+  angle?: number;
+  stops: Array<{ offset: number; color: string }>;
+}
+
+export type BackgroundPatternType =
+  | 'none'
+  | 'guilloche'
+  | 'waves'
+  | 'geometric'
+  | 'dots'
+  | 'grid'
+  | 'parchment';
+
+export interface BackgroundPattern {
+  type: BackgroundPatternType;
+  color?: string;
+  opacity?: number;
+  scale?: number;
+}
+
+// ---------------------------------------------------------------------------
+// Version History Snapshot
+// ---------------------------------------------------------------------------
+export interface VersionSnapshot {
+  id: string;
+  timestamp: number;
+  label: string;
+  document: CertificateDocument;
+}
+
+// ---------------------------------------------------------------------------
 // Certificate Document (the complete design)
 // ---------------------------------------------------------------------------
 export type Orientation = 'landscape' | 'portrait';
-export type TemplateCategory = 'Built-in' | 'Imported' | 'Custom' | 'Smart Design';
+export type TemplateCategory =
+  | 'Achievement'
+  | 'Participation'
+  | 'Completion'
+  | 'Appreciation'
+  | 'Excellence'
+  | 'Academic'
+  | 'Competition'
+  | 'Sports'
+  | 'Workshop'
+  | 'Internship'
+  | 'Training'
+  | 'Corporate'
+  | 'Employee'
+  | 'Volunteer'
+  | 'Event'
+  | 'Custom'
+  | 'Built-in'
+  | 'Imported'
+  | 'Smart Design';
 
 export interface CertificateDocument {
   id: string;
@@ -278,6 +415,12 @@ export interface CertificateDocument {
   backgroundOpacity: number;
   backgroundFit: 'fill' | 'fit' | 'center' | 'stretch';
   backgroundLocked: boolean;
+  backgroundGradient?: BackgroundGradient;
+  backgroundPattern?: BackgroundPattern;
+
+  // Margins & Bleed
+  safeMargin?: number;
+  bleedArea?: number;
 
   // Elements
   elements: DocumentElement[];
@@ -285,43 +428,26 @@ export interface CertificateDocument {
   // Design aids
   guides: Guide[];
 
+  // Custom Fields (user-defined keys)
+  customFields?: Array<{ key: string; label: string; sampleValue: string }>;
+
   // Brand
   brandSettings?: BrandSettings;
 
   // Assets registry (key → indexedDB asset key)
   assets: Record<string, string>;
 
-  // Metadata
+  // Metadata & Version History
   thumbnailDataUrl?: string;
   version: number;
+  versionHistory?: VersionSnapshot[];
   createdAt: string;
   updatedAt: string;
 
   // Legacy compat
   isBuiltIn?: boolean;
   isImported?: boolean;
-
-  // Project/folder
   folderId?: string;
-}
-
-// ---------------------------------------------------------------------------
-// Project Folder
-// ---------------------------------------------------------------------------
-export interface ProjectFolder {
-  id: string;
-  name: string;
-  createdAt: string;
-}
-
-// ---------------------------------------------------------------------------
-// Template Package (for export/import)
-// ---------------------------------------------------------------------------
-export interface TemplatePackage {
-  template: CertificateDocument;
-  assets: Record<string, string>;
-  exportedAt: string;
-  version: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -349,7 +475,7 @@ export const DEFAULT_BRAND: BrandSettings = {
 // Element Factory Functions
 // ---------------------------------------------------------------------------
 let _elementCounter = 0;
-function nextId(prefix: string): string {
+export function nextId(prefix: string): string {
   _elementCounter++;
   return `${prefix}-${Date.now()}-${_elementCounter}-${Math.random().toString(36).substring(2, 5)}`;
 }
@@ -379,48 +505,61 @@ export function createTextElement(
   docWidth: number,
   docHeight: number,
   maxZ: number,
+  presetStyle?: Partial<TextStyleProps>,
 ): DocumentElement {
   return baseElement('text', isHeading ? 'Heading' : 'Body Text', {
-    x: docWidth / 2 - 150,
-    y: docHeight / 2 - 20,
-    width: 300,
-    height: isHeading ? 45 : 28,
+    x: Math.round(docWidth / 2 - 175),
+    y: Math.round(docHeight / 2 - 20),
+    width: 350,
+    height: isHeading ? 48 : 30,
     zIndex: maxZ + 1,
     textValue: text,
     textStyle: {
       fontSize: isHeading ? 28 : 14,
-      fontFamily: isHeading ? 'Georgia' : 'Helvetica',
+      fontFamily: isHeading ? 'Cinzel' : 'Inter',
       fontWeight: isHeading ? 'bold' : 'normal',
       fontStyle: 'normal',
       fill: '#0F172A',
       align: 'center',
+      autoFit: false,
+      minFontSize: 12,
+      maxFontSize: isHeading ? 36 : 20,
+      ...presetStyle,
     },
   });
 }
 
 export function createDynamicTextElement(
-  key: DynamicBindingKey,
+  key: string,
   docWidth: number,
   docHeight: number,
   maxZ: number,
+  customLabel?: string,
+  customSample?: string,
 ): DocumentElement {
   const opt = DYNAMIC_BINDING_OPTIONS.find((o) => o.key === key);
   const isName = key === '{{recipient.name}}';
-  return baseElement('dynamic-text', opt?.label || key, {
-    x: docWidth / 2 - 175,
-    y: docHeight / 2 - 20,
-    width: 350,
-    height: isName ? 45 : 30,
+  const label = customLabel || opt?.label || key;
+  const sample = customSample || opt?.sampleValue || key;
+
+  return baseElement('dynamic-text', label, {
+    x: Math.round(docWidth / 2 - 180),
+    y: Math.round(docHeight / 2 - 22),
+    width: 360,
+    height: isName ? 48 : 32,
     zIndex: maxZ + 1,
     dynamicBinding: key,
-    fallbackValue: opt?.sampleValue || key,
+    fallbackValue: sample,
     textStyle: {
-      fontSize: isName ? 32 : 16,
-      fontFamily: isName ? 'Georgia' : 'Helvetica',
+      fontSize: isName ? 30 : 16,
+      fontFamily: isName ? 'Playfair Display' : 'Inter',
       fontWeight: isName ? 'bold' : 'normal',
       fontStyle: 'normal',
       fill: '#0F172A',
       align: 'center',
+      autoFit: isName, // Auto-fit enabled by default for Recipient Name
+      minFontSize: 16,
+      maxFontSize: isName ? 40 : 24,
     },
   });
 }
@@ -433,18 +572,24 @@ export function createShapeElement(
   isMask = false,
 ): DocumentElement {
   const isLine = shapeType === 'line' || shapeType === 'arrow';
-  return baseElement('shape', isMask ? 'White Mask Box' : `${shapeType} Shape`, {
-    x: docWidth / 2 - 100,
-    y: docHeight / 2 - (isLine ? 1 : 50),
-    width: 200,
-    height: isLine ? 2 : 100,
+  const isCircleOrSquare = ['circle', 'ellipse', 'star', 'diamond', 'badge', 'seal', 'medal', 'heart'].includes(shapeType);
+  const defaultWidth = isLine ? 240 : isCircleOrSquare ? 110 : 160;
+  const defaultHeight = isLine ? 2 : isCircleOrSquare ? 110 : 100;
+
+  return baseElement('shape', isMask ? 'White Mask Box' : `${shapeType.charAt(0).toUpperCase() + shapeType.slice(1)} Shape`, {
+    x: Math.round(docWidth / 2 - defaultWidth / 2),
+    y: Math.round(docHeight / 2 - defaultHeight / 2),
+    width: defaultWidth,
+    height: defaultHeight,
     zIndex: maxZ + 1,
     shapeStyle: {
       shapeType,
-      fill: isMask ? '#FFFFFF' : isLine ? 'transparent' : '#2563EB',
-      stroke: isMask ? 'transparent' : '#0F172A',
+      fill: isMask ? '#FFFFFF' : isLine ? 'transparent' : '#1E40AF',
+      stroke: isMask ? 'transparent' : '#1E3A8A',
       strokeWidth: isMask ? 0 : isLine ? 2 : 1,
+      strokeStyle: 'solid',
       cornerRadius: shapeType === 'rounded-rectangle' ? 12 : 0,
+      points: shapeType === 'star' ? 5 : shapeType === 'polygon' || shapeType === 'hexagon' ? 6 : shapeType === 'octagon' ? 8 : shapeType === 'triangle' ? 3 : undefined,
     },
   });
 }
@@ -457,15 +602,19 @@ export function createImageElement(
   maxZ: number,
 ): DocumentElement {
   return baseElement('image', name, {
-    x: docWidth / 2 - 75,
-    y: docHeight / 2 - 75,
+    x: Math.round(docWidth / 2 - 75),
+    y: Math.round(docHeight / 2 - 75),
     width: 150,
     height: 150,
     zIndex: maxZ + 1,
+    aspectRatioLocked: true,
     imageStyle: {
       src: dataUrl,
       originalSrc: dataUrl,
       fitMode: 'contain',
+      maskShape: 'none',
+      borderWidth: 0,
+      borderColor: '#E2E8F0',
     },
   });
 }
@@ -477,12 +626,13 @@ export function createLogoElement(
   maxZ: number,
 ): DocumentElement {
   return baseElement('logo', 'Organization Logo', {
-    x: docWidth / 2 - 50,
-    y: 30,
-    width: 100,
-    height: 100,
+    x: Math.round(docWidth / 2 - 45),
+    y: 35,
+    width: 90,
+    height: 90,
     zIndex: maxZ + 1,
-    imageStyle: { src: dataUrl, originalSrc: dataUrl, fitMode: 'contain' },
+    aspectRatioLocked: true,
+    imageStyle: { src: dataUrl, originalSrc: dataUrl, fitMode: 'contain', maskShape: 'none' },
   });
 }
 
@@ -491,13 +641,16 @@ export function createSignatureElement(
   docWidth: number,
   docHeight: number,
   maxZ: number,
+  signatoryName = 'Signatory Name',
+  signatoryDesignation = 'Authorized Signatory',
 ): DocumentElement {
-  return baseElement('signature', 'Signature', {
-    x: docWidth / 2 - 60,
-    y: docHeight - 120,
-    width: 120,
-    height: 60,
+  return baseElement('signature', `Signature - ${signatoryName}`, {
+    x: Math.round(docWidth / 2 - 70),
+    y: docHeight - 130,
+    width: 140,
+    height: 65,
     zIndex: maxZ + 1,
+    aspectRatioLocked: true,
     imageStyle: { src: dataUrl, originalSrc: dataUrl, fitMode: 'contain' },
   });
 }
@@ -508,13 +661,14 @@ export function createQrElement(
   maxZ: number,
 ): DocumentElement {
   return baseElement('qr', 'Verification QR Code', {
-    x: docWidth - 110,
-    y: docHeight - 110,
-    width: 80,
-    height: 80,
+    x: docWidth - 115,
+    y: docHeight - 115,
+    width: 85,
+    height: 85,
     zIndex: maxZ + 1,
+    aspectRatioLocked: true,
     qrStyle: {
-      size: 80,
+      size: 85,
       fgColor: '#0F172A',
       bgColor: '#FFFFFF',
       displayCodeLabel: true,
@@ -526,6 +680,9 @@ export function createBorderElement(
   docWidth: number,
   docHeight: number,
   maxZ: number,
+  borderType: BorderStyleProps['borderType'] = 'double',
+  color = '#1E40AF',
+  width = 3,
 ): DocumentElement {
   return baseElement('border', 'Certificate Border', {
     x: 20,
@@ -534,11 +691,13 @@ export function createBorderElement(
     height: docHeight - 40,
     zIndex: maxZ + 1,
     borderStyle: {
-      borderType: 'solid',
-      color: '#1E40AF',
-      width: 2,
-      cornerRadius: 0,
+      borderType,
+      color,
+      width,
+      cornerRadius: 4,
       padding: 0,
+      inset: 6,
+      opacity: 1,
     },
   });
 }
@@ -548,22 +707,163 @@ export function createCertificateCodeElement(
   docHeight: number,
   maxZ: number,
 ): DocumentElement {
-  return baseElement('certificate-code', 'Certificate Code', {
-    x: docWidth / 2 - 100,
-    y: docHeight - 40,
-    width: 200,
+  return baseElement('certificate-code', 'Certificate ID & Verification Token', {
+    x: Math.round(docWidth / 2 - 140),
+    y: docHeight - 38,
+    width: 280,
     height: 20,
     zIndex: maxZ + 1,
     dynamicBinding: '{{certificate.code}}',
     textStyle: {
       fontSize: 10,
-      fontFamily: 'Courier New',
-      fontWeight: 'normal',
+      fontFamily: 'Inter',
+      fontWeight: 'bold',
       fontStyle: 'normal',
       fill: '#64748B',
       align: 'center',
+      letterSpacing: 1,
     },
   });
+}
+
+// ---------------------------------------------------------------------------
+// 4-Corner Decorative Ornament Set Generator
+// ---------------------------------------------------------------------------
+export function createCornerOrnamentSet(
+  style: CornerOrnamentStyle,
+  docWidth: number,
+  docHeight: number,
+  maxZ: number,
+  color = '#D97706',
+): DocumentElement[] {
+  const size = 55;
+  const padding = 28;
+
+  const corners = [
+    { name: 'Top-Left Ornament', x: padding, y: padding, rot: 0 },
+    { name: 'Top-Right Ornament', x: docWidth - padding - size, y: padding, rot: 90 },
+    { name: 'Bottom-Right Ornament', x: docWidth - padding - size, y: docHeight - padding - size, rot: 180 },
+    { name: 'Bottom-Left Ornament', x: padding, y: docHeight - padding - size, rot: 270 },
+  ];
+
+  const groupId = nextId('group-ornaments');
+
+  return corners.map((c, i) =>
+    baseElement('shape', c.name, {
+      x: c.x,
+      y: c.y,
+      width: size,
+      height: size,
+      rotation: c.rot,
+      zIndex: maxZ + 1 + i,
+      groupId,
+      shapeStyle: {
+        shapeType: 'rounded-rectangle',
+        fill: 'transparent',
+        stroke: color,
+        strokeWidth: style === 'luxury' ? 2.5 : style === 'minimal' ? 1 : 2,
+        cornerRadius: style === 'geometric' ? 0 : 6,
+        strokeStyle: style === 'luxury' ? 'solid' : 'solid',
+      },
+    })
+  );
+}
+
+export function createDecorativeShapePreset(
+  presetType:
+    | 'divider'
+    | 'double-divider'
+    | 'corner-ornament'
+    | 'decorative-circle'
+    | 'star-accent'
+    | 'seal-placeholder'
+    | 'ribbon-badge'
+    | 'gold-medal',
+  docWidth: number,
+  docHeight: number,
+  maxZ: number,
+): DocumentElement {
+  switch (presetType) {
+    case 'divider':
+      return baseElement('shape', 'Accent Divider Line', {
+        x: Math.round(docWidth / 2 - 160),
+        y: Math.round(docHeight / 2),
+        width: 320,
+        height: 2,
+        zIndex: maxZ + 1,
+        shapeStyle: { shapeType: 'line', fill: 'transparent', stroke: '#1E40AF', strokeWidth: 2, strokeStyle: 'solid' },
+      });
+
+    case 'double-divider':
+      return baseElement('shape', 'Double Divider', {
+        x: Math.round(docWidth / 2 - 160),
+        y: Math.round(docHeight / 2),
+        width: 320,
+        height: 4,
+        zIndex: maxZ + 1,
+        shapeStyle: { shapeType: 'line', fill: 'transparent', stroke: '#1E40AF', strokeWidth: 3, strokeStyle: 'dashed' },
+      });
+
+    case 'corner-ornament':
+      return baseElement('shape', 'Corner Ornament Frame', {
+        x: 35,
+        y: 35,
+        width: 60,
+        height: 60,
+        zIndex: maxZ + 1,
+        shapeStyle: { shapeType: 'rounded-rectangle', fill: 'transparent', stroke: '#D97706', strokeWidth: 2, cornerRadius: 4 },
+      });
+
+    case 'decorative-circle':
+      return baseElement('shape', 'Decorative Dashed Ring', {
+        x: Math.round(docWidth / 2 - 60),
+        y: Math.round(docHeight / 2 - 60),
+        width: 120,
+        height: 120,
+        zIndex: maxZ + 1,
+        shapeStyle: { shapeType: 'circle', fill: 'transparent', stroke: '#1E40AF', strokeWidth: 2, strokeStyle: 'dashed' },
+      });
+
+    case 'star-accent':
+      return baseElement('shape', 'Gold Star Accent', {
+        x: Math.round(docWidth / 2 - 25),
+        y: Math.round(docHeight / 2 - 25),
+        width: 50,
+        height: 50,
+        zIndex: maxZ + 1,
+        shapeStyle: { shapeType: 'star', fill: '#F59E0B', stroke: '#B45309', strokeWidth: 1, points: 5, innerRadiusRatio: 0.45 },
+      });
+
+    case 'seal-placeholder':
+      return baseElement('shape', 'Official Seal Badge', {
+        x: Math.round(docWidth - 145),
+        y: Math.round(docHeight - 145),
+        width: 95,
+        height: 95,
+        zIndex: maxZ + 1,
+        shapeStyle: { shapeType: 'seal', fill: '#B45309', stroke: '#F59E0B', strokeWidth: 2, points: 16, innerRadiusRatio: 0.85 },
+      });
+
+    case 'ribbon-badge':
+      return baseElement('shape', 'Honor Ribbon Banner', {
+        x: Math.round(docWidth / 2 - 75),
+        y: 110,
+        width: 150,
+        height: 45,
+        zIndex: maxZ + 1,
+        shapeStyle: { shapeType: 'ribbon', fill: '#1E40AF', stroke: '#38BDF8', strokeWidth: 1.5 },
+      });
+
+    case 'gold-medal':
+      return baseElement('shape', 'Excellence Medal', {
+        x: Math.round(docWidth - 130),
+        y: 40,
+        width: 75,
+        height: 75,
+        zIndex: maxZ + 1,
+        shapeStyle: { shapeType: 'medal', fill: '#D97706', stroke: '#FDE68A', strokeWidth: 2 },
+      });
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -588,8 +888,10 @@ export function createBlankDocument(
     backgroundLocked: false,
     elements: [],
     guides: [],
+    customFields: [],
     assets: {},
     version: 1,
+    versionHistory: [],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -623,13 +925,14 @@ export function migrateFromLegacy(legacy: Record<string, unknown>): CertificateD
       visible: (e.visible as boolean) ?? true,
       locked: (e.locked as boolean) ?? false,
       groupId: e.groupId as string | undefined,
+      aspectRatioLocked: e.aspectRatioLocked as boolean | undefined,
       textValue: e.textValue as string | undefined,
       textStyle: e.textStyle as TextStyleProps | undefined,
       shapeStyle: e.shapeStyle as ShapeStyleProps | undefined,
       imageStyle: e.imageStyle as ImageStyleProps | undefined,
       qrStyle: e.qrStyle as QrStyleProps | undefined,
       borderStyle: e.borderStyle as BorderStyleProps | undefined,
-      dynamicBinding: e.dynamicBinding as DynamicBindingKey | undefined,
+      dynamicBinding: (e.dynamicBinding as string) || undefined,
       fallbackValue: e.fallbackValue as string | undefined,
     };
   });
@@ -649,8 +952,10 @@ export function migrateFromLegacy(legacy: Record<string, unknown>): CertificateD
     backgroundLocked: false,
     elements,
     guides: [],
+    customFields: [],
     assets: {},
     version: (legacy.version as number) || 1,
+    versionHistory: [],
     createdAt: (legacy.createdAt as string) || new Date().toISOString(),
     updatedAt: (legacy.updatedAt as string) || new Date().toISOString(),
     isBuiltIn: legacy.isBuiltIn as boolean | undefined,

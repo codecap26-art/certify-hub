@@ -1,98 +1,123 @@
 'use client';
 
 import React from 'react';
-import { ZoomIn, ZoomOut, Maximize2, Monitor, Layers } from 'lucide-react';
+import {
+  Grid,
+  Magnet,
+  Maximize2,
+  Minimize2,
+  Shield,
+  Square,
+  Sparkles,
+  Layers,
+  Ruler,
+} from 'lucide-react';
 import { useEditor } from '@/lib/editor/useEditorStore';
 
 export const BottomStatusBar: React.FC = () => {
   const { state, dispatch } = useEditor();
-  const { document: doc, viewport, selection } = state;
-
-  const selCount = selection.selectedIds.length;
-  const elemCount = doc.elements.length;
+  const {
+    document: doc,
+    viewport,
+    showGrid,
+    snappingEnabled,
+    showRulers,
+    showSafeArea,
+    showBleedArea,
+    showFieldNames,
+  } = state;
 
   return (
-    <footer className="h-8 bg-white border-t border-slate-200 px-3 flex items-center justify-between text-[10px] text-slate-500 font-medium z-30 shrink-0">
-      {/* Left info */}
+    <footer className="h-8 bg-white border-t border-slate-200 px-3 flex items-center justify-between text-[11px] text-slate-600 shadow-xs z-40 shrink-0 select-none">
+      {/* ── Left: Document Dimensions & Element Count ── */}
       <div className="flex items-center gap-3">
-        <span className="flex items-center gap-1">
-          <Layers className="w-3 h-3 text-slate-400" />
-          {elemCount} element{elemCount !== 1 ? 's' : ''}
+        <span className="font-semibold text-slate-700">
+          {doc.width} × {doc.height} px
         </span>
-        {selCount > 0 && (
-          <span className="text-blue-600 font-semibold">
-            {selCount} selected
-          </span>
-        )}
-        <span className="text-slate-400">
-          {doc.width} × {doc.height} pt ({doc.orientation})
+
+        <span className="text-slate-300">·</span>
+
+        <span className="text-slate-500">
+          {doc.elements.length} element{doc.elements.length === 1 ? '' : 's'}
         </span>
+
+        <span className="text-slate-300">·</span>
+
+        {/* Sample Data Toggle */}
+        <button
+          onClick={() => dispatch({ type: 'TOGGLE_FIELD_NAMES' })}
+          className={`flex items-center gap-1 px-2 py-0.5 rounded-md font-semibold transition ${
+            showFieldNames
+              ? 'bg-blue-50 text-blue-700 border border-blue-200'
+              : 'text-slate-600 hover:bg-slate-100'
+          }`}
+          title="Toggle between Field Tokens ({{name}}) and Live Sample Data"
+        >
+          <Sparkles className="w-3 h-3 text-amber-500" />
+          <span>{showFieldNames ? 'Token Names' : 'Sample Data View'}</span>
+        </button>
       </div>
 
-      {/* Right zoom controls */}
+      {/* ── Right: Tool Toggles (Rulers, Grid, Snap, Safe Area, Bleed) ── */}
       <div className="flex items-center gap-1.5">
+        {/* Rulers Toggle */}
         <button
-          onClick={() => dispatch({ type: 'ZOOM_OUT' })}
-          className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition"
-          title="Zoom Out"
-          aria-label="Zoom out"
+          onClick={() => dispatch({ type: 'TOGGLE_RULERS' })}
+          className={`flex items-center gap-1 px-2 py-0.5 rounded-md transition ${
+            showRulers ? 'bg-blue-50 text-blue-700 font-bold border border-blue-200' : 'hover:bg-slate-100 text-slate-500'
+          }`}
+          title="Toggle Rulers"
         >
-          <ZoomOut className="w-3 h-3" />
+          <Ruler className="w-3 h-3" />
+          <span className="hidden sm:inline">Rulers</span>
         </button>
 
-        <input
-          type="range"
-          min={15}
-          max={300}
-          step={5}
-          value={Math.round(viewport.zoom * 100)}
-          onChange={(e) =>
-            dispatch({
-              type: 'SET_VIEWPORT',
-              viewport: { ...viewport, zoom: parseInt(e.target.value, 10) / 100 },
-            })
-          }
-          className="w-20 h-1 accent-blue-600"
-          title={`Zoom: ${Math.round(viewport.zoom * 100)}%`}
-          aria-label="Zoom slider"
-        />
-
-        <span className="font-mono w-9 text-center text-slate-600">
-          {Math.round(viewport.zoom * 100)}%
-        </span>
-
+        {/* Grid Toggle */}
         <button
-          onClick={() => dispatch({ type: 'ZOOM_IN' })}
-          className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition"
-          title="Zoom In"
-          aria-label="Zoom in"
+          onClick={() => dispatch({ type: 'TOGGLE_GRID' })}
+          className={`flex items-center gap-1 px-2 py-0.5 rounded-md transition ${
+            showGrid ? 'bg-blue-50 text-blue-700 font-bold border border-blue-200' : 'hover:bg-slate-100 text-slate-500'
+          }`}
+          title="Toggle Grid (20px)"
         >
-          <ZoomIn className="w-3 h-3" />
+          <Grid className="w-3 h-3" />
+          <span className="hidden sm:inline">Grid</span>
         </button>
 
-        <div className="w-px h-3 bg-slate-200" />
-
+        {/* Snapping Toggle */}
         <button
-          onClick={() =>
-            dispatch({
-              type: 'ZOOM_FIT',
-              containerWidth: window.innerWidth - 400,
-              containerHeight: window.innerHeight - 100,
-            })
-          }
-          className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition"
-          title="Fit Page"
-          aria-label="Fit page in view"
+          onClick={() => dispatch({ type: 'TOGGLE_SNAPPING' })}
+          className={`flex items-center gap-1 px-2 py-0.5 rounded-md transition ${
+            snappingEnabled ? 'bg-blue-50 text-blue-700 font-bold border border-blue-200' : 'hover:bg-slate-100 text-slate-500'
+          }`}
+          title="Toggle Smart Snapping Guides"
         >
-          <Maximize2 className="w-3 h-3" />
+          <Magnet className="w-3 h-3" />
+          <span className="hidden sm:inline">Snap</span>
         </button>
+
+        {/* Safe Margins Toggle */}
         <button
-          onClick={() => dispatch({ type: 'ZOOM_100' })}
-          className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition"
-          title="100%"
-          aria-label="Zoom to 100%"
+          onClick={() => dispatch({ type: 'TOGGLE_SAFE_AREA' })}
+          className={`flex items-center gap-1 px-2 py-0.5 rounded-md transition ${
+            showSafeArea ? 'bg-blue-50 text-blue-700 font-bold border border-blue-200' : 'hover:bg-slate-100 text-slate-500'
+          }`}
+          title="Toggle Safe Margins (Print safe boundary)"
         >
-          <Monitor className="w-3 h-3" />
+          <Shield className="w-3 h-3" />
+          <span className="hidden md:inline">Safe Margin</span>
+        </button>
+
+        {/* Bleed Area Toggle */}
+        <button
+          onClick={() => dispatch({ type: 'TOGGLE_BLEED_AREA' })}
+          className={`flex items-center gap-1 px-2 py-0.5 rounded-md transition ${
+            showBleedArea ? 'bg-rose-50 text-rose-700 font-bold border border-rose-200' : 'hover:bg-slate-100 text-slate-500'
+          }`}
+          title="Toggle Bleed Boundary (8px cut-line)"
+        >
+          <Square className="w-3 h-3" />
+          <span className="hidden md:inline">Bleed</span>
         </button>
       </div>
     </footer>

@@ -84,13 +84,13 @@ export const BrandPanel: React.FC = () => {
       </div>
 
       {view === 'signatories' && (
-        <div className="p-2">
+        <div className="flex-1 overflow-y-auto p-3">
           <SignatoryManager />
         </div>
       )}
 
       {view === 'logos' && (
-        <div className="p-2">
+        <div className="flex-1 overflow-y-auto p-3">
           <LogoPartnerManager />
         </div>
       )}

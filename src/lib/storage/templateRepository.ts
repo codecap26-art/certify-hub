@@ -17,7 +17,21 @@ export const templateRepository = {
 
   async getById(id: string): Promise<CustomTemplate | null> {
     const list = this.getAll();
-    const t = list.find((item) => item.id === id);
+    let t = list.find((item) => item.id === id);
+
+    // Fallback for legacy template string IDs to corresponding built-in templates
+    if (!t) {
+      if (id === 'modern-blue') {
+        t = list.find((item) => item.id === 'tmpl-institutional-appreciation');
+      } else if (id === 'classic-gold') {
+        t = list.find((item) => item.id === 'tmpl-competition-winner');
+      } else if (id === 'minimal-green') {
+        t = list.find((item) => item.id === 'tmpl-academic-participation');
+      } else if (id === 'academic-maroon') {
+        t = list.find((item) => item.id === 'tmpl-training-completion');
+      }
+    }
+
     if (!t) return null;
 
     // Restore assets from IndexedDB if stored as references
