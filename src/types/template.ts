@@ -24,6 +24,8 @@ export type DynamicBindingKey =
   | '{{recipient.course}}'
   | '{{recipient.achievement}}'
   | '{{recipient.rank}}'
+  | '{{recipient.role}}'
+  | '{{recipient.category}}'
   | '{{organization.name}}'
   | '{{organization.address}}'
   | '{{organization.affiliation}}'

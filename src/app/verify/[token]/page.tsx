@@ -129,55 +129,86 @@ export default function VerificationResultPage({ params }: { params: Promise<{ t
 
       {/* Snapshot Verification Details Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white border border-slate-200 p-5 rounded-2xl space-y-2 shadow-xs">
-          <div className="flex items-center gap-2 text-blue-600 text-xs font-semibold">
+        <div
+          className="p-5 rounded-2xl space-y-2 border shadow-xs"
+          style={{
+            backgroundColor: 'var(--surface)',
+            borderColor: 'var(--border)',
+          }}
+        >
+          <div className="flex items-center gap-2 text-xs font-semibold" style={{ color: 'var(--primary)' }}>
             <User className="w-4 h-4" />
             <span>Recipient</span>
           </div>
-          <p className="text-sm font-bold text-slate-900">{certificate.recipientSnapshot.fullName}</p>
-          <p className="text-xs text-slate-500">
+          <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{certificate.recipientSnapshot.fullName}</p>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
             {certificate.recipientSnapshot.registrationNumber || certificate.recipientSnapshot.email}
           </p>
         </div>
 
-        <div className="bg-white border border-slate-200 p-5 rounded-2xl space-y-2 shadow-xs">
-          <div className="flex items-center gap-2 text-teal-600 text-xs font-semibold">
+        <div
+          className="p-5 rounded-2xl space-y-2 border shadow-xs"
+          style={{
+            backgroundColor: 'var(--surface)',
+            borderColor: 'var(--border)',
+          }}
+        >
+          <div className="flex items-center gap-2 text-xs font-semibold" style={{ color: 'var(--secondary)' }}>
             <Calendar className="w-4 h-4" />
             <span>Event / Course</span>
           </div>
-          <p className="text-sm font-bold text-slate-900">{certificate.eventSnapshot.name}</p>
-          <p className="text-xs text-slate-500">{certificate.eventSnapshot.startDate}</p>
+          <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{certificate.eventSnapshot.name}</p>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{certificate.eventSnapshot.startDate}</p>
         </div>
 
-        <div className="bg-white border border-slate-200 p-5 rounded-2xl space-y-2 shadow-xs">
-          <div className="flex items-center gap-2 text-indigo-600 text-xs font-semibold">
+        <div
+          className="p-5 rounded-2xl space-y-2 border shadow-xs"
+          style={{
+            backgroundColor: 'var(--surface)',
+            borderColor: 'var(--border)',
+          }}
+        >
+          <div className="flex items-center gap-2 text-xs font-semibold" style={{ color: 'var(--primary)' }}>
             <Building2 className="w-4 h-4" />
             <span>Issuing Institute</span>
           </div>
-          <p className="text-sm font-bold text-slate-900">{certificate.organizationSnapshot.name}</p>
-          <p className="text-xs text-slate-500">{certificate.organizationSnapshot.type}</p>
+          <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{certificate.organizationSnapshot.name}</p>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{certificate.organizationSnapshot.type}</p>
         </div>
       </div>
 
       {/* Certificate Visual & Actions */}
-      <div className="bg-white border border-slate-200 p-6 rounded-2xl space-y-4 shadow-xs">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-          <span className="text-xs font-bold text-slate-900 flex items-center gap-2">
-            <FileCheck className="w-4 h-4 text-blue-600" />
+      <div
+        className="p-6 rounded-2xl space-y-4 border shadow-xs"
+        style={{
+          backgroundColor: 'var(--surface)',
+          borderColor: 'var(--border)',
+        }}
+      >
+        <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: 'var(--border-subtle)' }}>
+          <span className="text-xs font-bold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+            <FileCheck className="w-4 h-4" style={{ color: 'var(--primary)' }} />
             <span>Authenticated Certificate Document</span>
           </span>
 
           <button
             onClick={handleDownload}
             disabled={isDownloading}
-            className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-4 rounded-lg shadow-xs transition"
+            className="flex items-center gap-1.5 text-white text-xs font-bold py-2 px-4 rounded-lg shadow-xs transition"
+            style={{ backgroundColor: 'var(--primary)' }}
           >
             <Download className="w-4 h-4" />
             <span>{isDownloading ? 'Downloading...' : 'Download Official PDF'}</span>
           </button>
         </div>
 
-        <div className="bg-slate-100 p-4 rounded-xl border border-slate-200">
+        <div
+          className="p-4 rounded-xl border flex justify-center"
+          style={{
+            backgroundColor: 'var(--surface-subtle)',
+            borderColor: 'var(--border-subtle)',
+          }}
+        >
           <CertificateRenderer certificate={certificate} />
         </div>
       </div>

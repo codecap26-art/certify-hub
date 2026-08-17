@@ -22,9 +22,9 @@ describe('Global Theme System', () => {
     });
   });
 
-  it('has default Dark Violet & Sky Blue theme as primary theme fallback', () => {
+  it('has default Modern Indigo theme as primary theme fallback', () => {
     const defaultTheme = THEME_CONFIGS[0];
-    expect(defaultTheme.id).toBe('dark-violet-sky');
-    expect(defaultTheme.previewPrimary).toBe('#8B5CF6');
+    expect(defaultTheme.id).toBe('indigo');
+    expect(defaultTheme.previewPrimary).toBe('#2563EB');
   });
 });

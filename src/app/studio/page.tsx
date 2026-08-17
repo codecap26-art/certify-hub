@@ -153,19 +153,33 @@ export default function StudioLandingPage() {
       {/* 4 Large Action Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         {/* Card 1: Guided Certificate Builder */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-xs hover:shadow-md hover:border-blue-300 transition flex flex-col justify-between group">
+        <div
+          className="rounded-2xl p-6 space-y-4 border shadow-xs transition flex flex-col justify-between group"
+          style={{
+            backgroundColor: 'var(--surface)',
+            borderColor: 'var(--border)',
+          }}
+        >
           <div className="space-y-3">
-            <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 group-hover:scale-105 transition">
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center border group-hover:scale-105 transition"
+              style={{
+                backgroundColor: 'var(--primary-light)',
+                borderColor: 'var(--primary-border)',
+                color: 'var(--primary)',
+              }}
+            >
               <Sparkles className="w-6 h-6" />
             </div>
-            <h3 className="font-bold text-base text-slate-900">Guided Certificate Builder</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <h3 className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>Guided Certificate Builder</h3>
+            <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>
               Step-by-step wizard guiding beginners through 10 steps to build an institutional certificate.
             </p>
           </div>
           <button
             onClick={() => setShowGuidedBuilder(true)}
-            className="w-full inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-xs transition"
+            className="w-full inline-flex items-center justify-center gap-2 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-xs transition"
+            style={{ backgroundColor: 'var(--primary)' }}
           >
             <span>Launch Guided Wizard</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -173,16 +187,27 @@ export default function StudioLandingPage() {
         </div>
 
         {/* Card 2: Import Organization Template */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-xs hover:shadow-md hover:border-teal-300 transition flex flex-col justify-between group">
-          <div className="space-y-3">
-            <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center border border-teal-100 group-hover:scale-105 transition">
-              <Upload className="w-6 h-6" />
-            </div>
-            <h3 className="font-bold text-base text-slate-900">Import Organization Template</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Upload PNG/JPG/PDF background from Canva, Figma or Illustrator & add dynamic fields.
-            </p>
+        <div
+          className="rounded-2xl p-6 space-y-4 border shadow-xs transition flex flex-col justify-between group"
+          style={{
+            backgroundColor: 'var(--surface)',
+            borderColor: 'var(--border)',
+          }}
+        >
+          <div
+            className="w-12 h-12 rounded-xl flex items-center justify-center border group-hover:scale-105 transition"
+            style={{
+              backgroundColor: 'var(--secondary-light)',
+              borderColor: 'var(--border)',
+              color: 'var(--secondary)',
+            }}
+          >
+            <Upload className="w-6 h-6" />
           </div>
+          <h3 className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>Import Organization Template</h3>
+          <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+            Upload PNG/JPG/PDF background from Canva, Figma or Illustrator & add dynamic fields.
+          </p>
           <button
             onClick={() => setShowImportModal(true)}
             className="w-full inline-flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-xs transition"
@@ -193,19 +218,37 @@ export default function StudioLandingPage() {
         </div>
 
         {/* Card 3: Use Ready Template */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-xs hover:shadow-md hover:border-slate-300 transition flex flex-col justify-between group">
+        <div
+          className="rounded-2xl p-6 space-y-4 border shadow-xs transition flex flex-col justify-between group"
+          style={{
+            backgroundColor: 'var(--surface)',
+            borderColor: 'var(--border)',
+          }}
+        >
           <div className="space-y-3">
-            <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-100 group-hover:scale-105 transition">
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center border group-hover:scale-105 transition"
+              style={{
+                backgroundColor: 'var(--surface-subtle)',
+                borderColor: 'var(--border)',
+                color: 'var(--primary)',
+              }}
+            >
               <Layers className="w-6 h-6" />
             </div>
-            <h3 className="font-bold text-base text-slate-900">Use Ready Template</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <h3 className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>Use Ready Template</h3>
+            <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>
               Browse 8 built-in institutional templates including Institutional Appreciation.
             </p>
           </div>
           <Link
             href="/templates"
-            className="w-full inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-xs transition"
+            className="w-full inline-flex items-center justify-center gap-2 font-bold py-2.5 px-4 rounded-xl text-xs shadow-xs transition border"
+            style={{
+              backgroundColor: 'var(--surface-subtle)',
+              borderColor: 'var(--border)',
+              color: 'var(--text-primary)',
+            }}
           >
             <span>Browse Ready Presets</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -213,13 +256,26 @@ export default function StudioLandingPage() {
         </div>
 
         {/* Card 4: Create from Scratch */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-xs hover:shadow-md hover:border-amber-300 transition flex flex-col justify-between group">
+        <div
+          className="rounded-2xl p-6 space-y-4 border shadow-xs transition flex flex-col justify-between group"
+          style={{
+            backgroundColor: 'var(--surface)',
+            borderColor: 'var(--border)',
+          }}
+        >
           <div className="space-y-3">
-            <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100 group-hover:scale-105 transition">
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center border group-hover:scale-105 transition"
+              style={{
+                backgroundColor: 'var(--warning-light)',
+                borderColor: 'var(--warning-border)',
+                color: 'var(--warning)',
+              }}
+            >
               <PlusCircle className="w-6 h-6" />
             </div>
-            <h3 className="font-bold text-base text-slate-900">Create from Scratch</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <h3 className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>Create from Scratch</h3>
+            <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>
               Start with a blank A4 canvas and construct your custom certificate element by element.
             </p>
           </div>
@@ -237,11 +293,11 @@ export default function StudioLandingPage() {
       {recentDesigns.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-blue-600" />
+            <h2 className="text-base font-bold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+              <Clock className="w-4 h-4" style={{ color: 'var(--primary)' }} />
               <span>Recent Designs</span>
             </h2>
-            <Link href="/studio/designs" className="text-xs font-semibold text-blue-600 hover:underline">
+            <Link href="/studio/designs" className="text-xs font-semibold hover:underline" style={{ color: 'var(--primary)' }}>
               View All My Designs ({customTemplates.length}) →
             </Link>
           </div>
@@ -250,36 +306,58 @@ export default function StudioLandingPage() {
             {recentDesigns.map((tmpl) => (
               <div
                 key={tmpl.id}
-                className="bg-white border border-slate-200 rounded-2xl p-4 space-y-3 shadow-xs hover:border-slate-300 transition flex flex-col justify-between"
+                className="rounded-2xl p-4 space-y-3 border shadow-xs transition flex flex-col justify-between"
+                style={{
+                  backgroundColor: 'var(--surface)',
+                  borderColor: 'var(--border)',
+                }}
               >
                 <div className="space-y-2">
-                  <div className="h-24 bg-slate-100 rounded-xl flex items-center justify-center border border-slate-200 text-slate-500 overflow-hidden relative">
+                  <div
+                    className="h-24 rounded-xl flex items-center justify-center border overflow-hidden relative"
+                    style={{
+                      backgroundColor: 'var(--surface-subtle)',
+                      borderColor: 'var(--border-subtle)',
+                    }}
+                  >
                     {tmpl.thumbnailDataUrl && !tmpl.thumbnailDataUrl.startsWith('indexeddb:') ? (
                       <img src={tmpl.thumbnailDataUrl} alt={tmpl.name} className="w-full h-full object-cover" />
                     ) : (
                       <div className="text-center p-2">
-                        <Layout className="w-6 h-6 mx-auto mb-1 text-slate-400" />
-                        <span className="text-[10px] font-mono text-slate-500 uppercase">{tmpl.orientation}</span>
+                        <Layout className="w-6 h-6 mx-auto mb-1" style={{ color: 'var(--text-muted)' }} />
+                        <span className="text-[10px] font-mono uppercase" style={{ color: 'var(--text-muted)' }}>{tmpl.orientation}</span>
                       </div>
                     )}
                   </div>
 
                   <div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md">
+                      <span
+                        className="text-[10px] font-bold px-2 py-0.5 rounded-md border"
+                        style={{
+                          backgroundColor: 'var(--primary-light)',
+                          borderColor: 'var(--primary-border)',
+                          color: 'var(--primary)',
+                        }}
+                      >
                         {tmpl.category}
                       </span>
-                      <span className="text-[10px] text-slate-400">
+                      <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
                         {new Date(tmpl.updatedAt).toLocaleDateString()}
                       </span>
                     </div>
-                    <h3 className="font-bold text-xs text-slate-900 truncate mt-1">{tmpl.name}</h3>
+                    <h3 className="font-bold text-xs truncate mt-1" style={{ color: 'var(--text-primary)' }}>{tmpl.name}</h3>
                   </div>
                 </div>
 
                 <Link
                   href={`/studio/editor/${tmpl.id}`}
-                  className="w-full flex items-center justify-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold py-2 rounded-lg text-xs transition border border-blue-200"
+                  className="w-full flex items-center justify-center gap-1.5 font-bold py-2 rounded-lg text-xs transition border"
+                  style={{
+                    backgroundColor: 'var(--surface-subtle)',
+                    borderColor: 'var(--border)',
+                    color: 'var(--primary)',
+                  }}
                 >
                   <Edit3 className="w-3.5 h-3.5" />
                   <span>Open Editor</span>
@@ -293,11 +371,11 @@ export default function StudioLandingPage() {
       {/* Dashboard Section 2: Quick-Start Built-in Templates */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-            <Layout className="w-4 h-4 text-indigo-600" />
+          <h2 className="text-base font-bold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+            <Layout className="w-4 h-4" style={{ color: 'var(--secondary)' }} />
             <span>Quick-Start Built-in Presets</span>
           </h2>
-          <Link href="/templates" className="text-xs font-semibold text-blue-600 hover:underline">
+          <Link href="/templates" className="text-xs font-semibold hover:underline" style={{ color: 'var(--primary)' }}>
             Browse Full Catalog →
           </Link>
         </div>
@@ -306,7 +384,11 @@ export default function StudioLandingPage() {
           {TEMPLATES.map((builtIn) => (
             <div
               key={builtIn.id}
-              className="bg-white border border-slate-200 rounded-2xl p-4 space-y-3 shadow-xs hover:border-slate-300 transition flex flex-col justify-between"
+              className="rounded-2xl p-4 space-y-3 border shadow-xs transition flex flex-col justify-between"
+              style={{
+                backgroundColor: 'var(--surface)',
+                borderColor: 'var(--border)',
+              }}
             >
               <div className="space-y-2">
                 <div
@@ -316,14 +398,19 @@ export default function StudioLandingPage() {
                   {builtIn.name}
                 </div>
                 <div>
-                  <h3 className="font-bold text-xs text-slate-900">{builtIn.name}</h3>
-                  <p className="text-[11px] text-slate-500 line-clamp-2 mt-0.5">{builtIn.description}</p>
+                  <h3 className="font-bold text-xs" style={{ color: 'var(--text-primary)' }}>{builtIn.name}</h3>
+                  <p className="text-[11px] line-clamp-2 mt-0.5" style={{ color: 'var(--text-muted)' }}>{builtIn.description}</p>
                 </div>
               </div>
 
               <button
                 onClick={() => handleDuplicateBuiltIn(builtIn.id)}
-                className="w-full flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2 rounded-lg text-xs transition border border-slate-200"
+                className="w-full flex items-center justify-center gap-1.5 font-semibold py-2 rounded-lg text-xs transition border"
+                style={{
+                  backgroundColor: 'var(--surface-subtle)',
+                  borderColor: 'var(--border)',
+                  color: 'var(--text-primary)',
+                }}
               >
                 <Copy className="w-3.5 h-3.5" />
                 <span>Customize in Studio</span>
@@ -334,15 +421,28 @@ export default function StudioLandingPage() {
       </div>
 
       {/* Dashboard Section 3: Browser Storage Summary */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-xs">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+      <div
+        className="rounded-2xl p-6 space-y-4 border shadow-xs"
+        style={{
+          backgroundColor: 'var(--surface)',
+          borderColor: 'var(--border)',
+        }}
+      >
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b pb-4" style={{ borderColor: 'var(--border-subtle)' }}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center border"
+              style={{
+                backgroundColor: 'var(--surface-subtle)',
+                borderColor: 'var(--border-subtle)',
+                color: 'var(--text-secondary)',
+              }}
+            >
               <HardDrive className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-sm text-slate-900">Local Browser Storage Summary</h3>
-              <p className="text-xs text-slate-500">
+              <h3 className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>Local Browser Storage Summary</h3>
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
                 Studio saves designs client-side in localStorage & IndexedDB (`certifyhub:v1:`).
               </p>
             </div>
@@ -351,40 +451,75 @@ export default function StudioLandingPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={handleExportBackup}
-              className="flex items-center gap-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold text-xs py-2 px-3 rounded-lg border border-slate-200 transition"
+              className="flex items-center gap-1.5 font-semibold text-xs py-2 px-3 rounded-lg border transition"
+              style={{
+                backgroundColor: 'var(--surface-subtle)',
+                borderColor: 'var(--border)',
+                color: 'var(--text-secondary)',
+              }}
             >
               <Download className="w-3.5 h-3.5" />
               <span>Export Backup JSON</span>
             </button>
             <Link
               href="/studio/designs"
-              className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 px-3 rounded-lg transition shadow-xs"
+              className="flex items-center gap-1.5 font-semibold text-xs py-2 px-3.5 rounded-lg border transition"
+              style={{
+                backgroundColor: 'var(--surface-subtle)',
+                borderColor: 'var(--border)',
+                color: 'var(--primary)',
+              }}
             >
-              <span>Manage Saved Designs</span>
+              <span>Manage Templates</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-1">
-          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Total Saved Designs</p>
-            <p className="text-lg font-bold text-slate-900 mt-1">{customTemplates.length}</p>
+          <div
+            className="p-3.5 rounded-xl border"
+            style={{
+              backgroundColor: 'var(--surface-subtle)',
+              borderColor: 'var(--border-subtle)',
+            }}
+          >
+            <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Total Saved Designs</p>
+            <p className="text-lg font-bold mt-1" style={{ color: 'var(--text-primary)' }}>{customTemplates.length}</p>
           </div>
-          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Imported Designs</p>
-            <p className="text-lg font-bold text-teal-700 mt-1">
+          <div
+            className="p-3.5 rounded-xl border"
+            style={{
+              backgroundColor: 'var(--surface-subtle)',
+              borderColor: 'var(--border-subtle)',
+            }}
+          >
+            <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Imported Designs</p>
+            <p className="text-lg font-bold text-teal-400 mt-1">
               {customTemplates.filter((t) => t.category === 'Imported').length}
             </p>
           </div>
-          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Smart-Generated</p>
-            <p className="text-lg font-bold text-amber-700 mt-1">
+          <div
+            className="p-3.5 rounded-xl border"
+            style={{
+              backgroundColor: 'var(--surface-subtle)',
+              borderColor: 'var(--border-subtle)',
+            }}
+          >
+            <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Smart-Generated</p>
+            <p className="text-lg font-bold text-amber-400 mt-1">
               {customTemplates.filter((t) => t.category === 'Smart Design').length}
             </p>
           </div>
-          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Approx Storage</p>
-            <p className="text-lg font-bold text-indigo-700 mt-1">{storageUsageStr}</p>
+          <div
+            className="p-3.5 rounded-xl border"
+            style={{
+              backgroundColor: 'var(--surface-subtle)',
+              borderColor: 'var(--border-subtle)',
+            }}
+          >
+            <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Approx Storage</p>
+            <p className="text-lg font-bold mt-1" style={{ color: 'var(--secondary)' }}>{storageUsageStr}</p>
           </div>
         </div>
       </div>

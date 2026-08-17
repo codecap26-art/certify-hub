@@ -69,6 +69,8 @@ export type DynamicBindingKey =
   | '{{recipient.course}}'
   | '{{recipient.achievement}}'
   | '{{recipient.rank}}'
+  | '{{recipient.role}}'
+  | '{{recipient.category}}'
   | '{{recipient.score}}'
   | '{{organization.name}}'
   | '{{organization.address}}'
@@ -551,7 +553,7 @@ export function createDynamicTextElement(
     dynamicBinding: key,
     fallbackValue: sample,
     textStyle: {
-      fontSize: isName ? 30 : 16,
+      fontSize: isName ? 32 : 16,
       fontFamily: isName ? 'Playfair Display' : 'Inter',
       fontWeight: isName ? 'bold' : 'normal',
       fontStyle: 'normal',

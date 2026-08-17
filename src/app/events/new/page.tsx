@@ -62,108 +62,150 @@ export default function CreateEventPage() {
         breadcrumbs={[{ label: 'Events', href: '/events' }, { label: 'Create New' }]}
       />
 
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-white border border-slate-200 p-6 rounded-2xl space-y-6 shadow-xs">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="p-6 rounded-2xl space-y-6 border shadow-xs"
+        style={{
+          backgroundColor: 'var(--surface)',
+          borderColor: 'var(--border)',
+        }}
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="md:col-span-2">
-            <label className="block text-xs font-semibold text-slate-700 mb-1" htmlFor="evt-name">
+            <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text-secondary)' }} htmlFor="evt-name">
               Event / Program Name *
             </label>
             <input
               id="evt-name"
               {...register('name')}
               placeholder="e.g. React 19 & Next.js App Router Workshop 2026"
-              className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="w-full rounded-lg px-4 py-2.5 text-sm focus:outline-none border transition"
+              style={{
+                backgroundColor: 'var(--surface-subtle)',
+                borderColor: 'var(--border)',
+                color: 'var(--text-primary)',
+              }}
             />
-            {errors.name && <p className="text-xs text-rose-600 mt-1">{errors.name.message}</p>}
+            {errors.name && <p className="text-xs text-rose-500 mt-1">{errors.name.message}</p>}
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1" htmlFor="evt-type">
+            <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text-secondary)' }} htmlFor="evt-type">
               Event Type *
             </label>
             <select
               id="evt-type"
               {...register('eventType')}
-              className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="w-full rounded-lg px-4 py-2.5 text-sm focus:outline-none border transition"
+              style={{
+                backgroundColor: 'var(--surface-subtle)',
+                borderColor: 'var(--border)',
+                color: 'var(--text-primary)',
+              }}
             >
-              <option value="Workshop">Workshop</option>
-              <option value="Course">Course</option>
-              <option value="Internship">Internship</option>
-              <option value="Competition">Competition</option>
-              <option value="Seminar">Seminar</option>
-              <option value="Conference">Conference</option>
+              <option value="Workshop" style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)' }}>Workshop</option>
+              <option value="Course" style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)' }}>Course</option>
+              <option value="Internship" style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)' }}>Internship</option>
+              <option value="Competition" style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)' }}>Competition</option>
+              <option value="Seminar" style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)' }}>Seminar</option>
+              <option value="Conference" style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)' }}>Conference</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1" htmlFor="cert-type">
+            <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text-secondary)' }} htmlFor="cert-type">
               Certificate Title Type *
             </label>
             <select
               id="cert-type"
               {...register('certificateType')}
-              className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="w-full rounded-lg px-4 py-2.5 text-sm focus:outline-none border transition"
+              style={{
+                backgroundColor: 'var(--surface-subtle)',
+                borderColor: 'var(--border)',
+                color: 'var(--text-primary)',
+              }}
             >
-              <option value="Participation">Certificate of Participation</option>
-              <option value="Completion">Certificate of Completion</option>
-              <option value="Excellence">Certificate of Excellence</option>
-              <option value="Merit">Certificate of Merit</option>
-              <option value="Achievement">Certificate of Achievement</option>
+              <option value="Participation" style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)' }}>Certificate of Participation</option>
+              <option value="Completion" style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)' }}>Certificate of Completion</option>
+              <option value="Excellence" style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)' }}>Certificate of Excellence</option>
+              <option value="Merit" style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)' }}>Certificate of Merit</option>
+              <option value="Achievement" style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)' }}>Certificate of Achievement</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1" htmlFor="start-date">
+            <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text-secondary)' }} htmlFor="start-date">
               Start Date *
             </label>
             <input
               id="start-date"
               type="date"
               {...register('startDate')}
-              className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="w-full rounded-lg px-4 py-2.5 text-sm focus:outline-none border transition"
+              style={{
+                backgroundColor: 'var(--surface-subtle)',
+                borderColor: 'var(--border)',
+                color: 'var(--text-primary)',
+              }}
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1" htmlFor="end-date">
+            <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text-secondary)' }} htmlFor="end-date">
               End Date *
             </label>
             <input
               id="end-date"
               type="date"
               {...register('endDate')}
-              className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="w-full rounded-lg px-4 py-2.5 text-sm focus:outline-none border transition"
+              style={{
+                backgroundColor: 'var(--surface-subtle)',
+                borderColor: 'var(--border)',
+                color: 'var(--text-primary)',
+              }}
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1" htmlFor="location">
+            <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text-secondary)' }} htmlFor="location">
               Venue / Location *
             </label>
             <input
               id="location"
               {...register('location')}
               placeholder="Auditorium Hall B / Online"
-              className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="w-full rounded-lg px-4 py-2.5 text-sm focus:outline-none border transition"
+              style={{
+                backgroundColor: 'var(--surface-subtle)',
+                borderColor: 'var(--border)',
+                color: 'var(--text-primary)',
+              }}
             />
-            {errors.location && <p className="text-xs text-rose-600 mt-1">{errors.location.message}</p>}
+            {errors.location && <p className="text-xs text-rose-500 mt-1">{errors.location.message}</p>}
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1" htmlFor="coord-name">
+            <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text-secondary)' }} htmlFor="coord-name">
               Program Coordinator Name *
             </label>
             <input
               id="coord-name"
               {...register('coordinatorName')}
               placeholder="Prof. K. Ramanathan"
-              className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="w-full rounded-lg px-4 py-2.5 text-sm focus:outline-none border transition"
+              style={{
+                backgroundColor: 'var(--surface-subtle)',
+                borderColor: 'var(--border)',
+                color: 'var(--text-primary)',
+              }}
             />
-            {errors.coordinatorName && <p className="text-xs text-rose-600 mt-1">{errors.coordinatorName.message}</p>}
+            {errors.coordinatorName && <p className="text-xs text-rose-500 mt-1">{errors.coordinatorName.message}</p>}
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-xs font-semibold text-slate-700 mb-1" htmlFor="description">
+            <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text-secondary)' }} htmlFor="description">
               Event Description *
             </label>
             <textarea
@@ -171,24 +213,35 @@ export default function CreateEventPage() {
               rows={3}
               {...register('description')}
               placeholder="Brief description of event goals and syllabus covered..."
-              className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="w-full rounded-lg px-4 py-2.5 text-sm focus:outline-none border transition"
+              style={{
+                backgroundColor: 'var(--surface-subtle)',
+                borderColor: 'var(--border)',
+                color: 'var(--text-primary)',
+              }}
             />
-            {errors.description && <p className="text-xs text-rose-600 mt-1">{errors.description.message}</p>}
+            {errors.description && <p className="text-xs text-rose-500 mt-1">{errors.description.message}</p>}
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3 border-t border-slate-100 pt-4">
+        <div className="flex items-center justify-end gap-3 border-t pt-4" style={{ borderColor: 'var(--border-subtle)' }}>
           <button
             type="button"
             onClick={() => router.push('/events')}
-            className="px-4 py-2.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200"
+            className="px-4 py-2.5 rounded-lg text-xs font-semibold border transition"
+            style={{
+              backgroundColor: 'var(--surface-subtle)',
+              borderColor: 'var(--border)',
+              color: 'var(--text-secondary)',
+            }}
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg shadow-xs transition text-xs disabled:opacity-50"
+            className="flex items-center gap-2 text-white font-bold py-2.5 px-6 rounded-lg shadow-xs transition text-xs disabled:opacity-50"
+            style={{ backgroundColor: 'var(--primary)' }}
           >
             <PlusCircle className="w-4 h-4" />
             <span>Create Event & Continue</span>

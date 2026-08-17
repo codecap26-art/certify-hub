@@ -144,7 +144,13 @@ export default function MyDesignsPage() {
       {/* Filter, Search & View Bar */}
       <div className="space-y-4">
         {/* Category Pill Filters */}
-        <div className="flex flex-wrap items-center gap-2 bg-white border border-slate-200 p-2 rounded-2xl shadow-xs">
+        <div
+          className="flex flex-wrap items-center gap-2 p-2 rounded-2xl border shadow-xs"
+          style={{
+            backgroundColor: 'var(--surface)',
+            borderColor: 'var(--border)',
+          }}
+        >
           {[
             { id: 'ALL', label: 'All Designs' },
             { id: 'Custom', label: 'Custom' },
@@ -156,11 +162,11 @@ export default function MyDesignsPage() {
             <button
               key={tab.id}
               onClick={() => setActiveFilter(tab.id as FilterType)}
-              className={`py-2 px-3.5 rounded-xl text-xs font-bold transition ${
-                activeFilter === tab.id
-                  ? 'bg-blue-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
+              className="py-2 px-3.5 rounded-xl text-xs font-bold transition"
+              style={{
+                backgroundColor: activeFilter === tab.id ? 'var(--primary)' : 'transparent',
+                color: activeFilter === tab.id ? 'var(--text-inverse)' : 'var(--text-secondary)',
+              }}
             >
               {tab.label}
             </button>
@@ -168,45 +174,71 @@ export default function MyDesignsPage() {
         </div>
 
         {/* Search, Sort & Grid Toggle */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white border border-slate-200 p-3.5 rounded-2xl shadow-xs">
+        <div
+          className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-2xl border shadow-xs"
+          style={{
+            backgroundColor: 'var(--surface)',
+            borderColor: 'var(--border)',
+          }}
+        >
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-muted)' }} />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by design name or description..."
-              className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-800 focus:outline-none"
+              className="w-full rounded-xl pl-10 pr-4 py-2 text-xs border focus:outline-none transition"
+              style={{
+                backgroundColor: 'var(--surface-subtle)',
+                borderColor: 'var(--border)',
+                color: 'var(--text-primary)',
+              }}
             />
           </div>
 
           <div className="flex items-center gap-2">
-            <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+            <Filter className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--text-muted)' }} />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as SortType)}
-              className="bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-xl px-3 py-2 focus:outline-none"
+              className="text-xs rounded-xl px-3 py-2 border focus:outline-none transition"
+              style={{
+                backgroundColor: 'var(--surface-subtle)',
+                borderColor: 'var(--border)',
+                color: 'var(--text-primary)',
+              }}
             >
-              <option value="newest">Sort: Newly Updated</option>
-              <option value="oldest">Sort: Oldest First</option>
-              <option value="name">Sort: Alphabetical</option>
+              <option value="newest" style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)' }}>Sort: Newly Updated</option>
+              <option value="oldest" style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)' }}>Sort: Oldest First</option>
+              <option value="name" style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)' }}>Sort: Alphabetical</option>
             </select>
 
-            <div className="flex items-center border border-slate-200 rounded-xl overflow-hidden bg-slate-50 p-0.5 ml-2">
+            <div
+              className="flex items-center border rounded-xl overflow-hidden p-0.5 ml-2"
+              style={{
+                backgroundColor: 'var(--surface-subtle)',
+                borderColor: 'var(--border)',
+              }}
+            >
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded-lg transition ${
-                  viewMode === 'grid' ? 'bg-white shadow-xs text-blue-600 font-bold' : 'text-slate-500'
-                }`}
+                className="p-1.5 rounded-lg transition"
+                style={{
+                  backgroundColor: viewMode === 'grid' ? 'var(--surface)' : 'transparent',
+                  color: viewMode === 'grid' ? 'var(--primary)' : 'var(--text-muted)',
+                }}
                 title="Grid View"
               >
                 <LayoutGrid className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-1.5 rounded-lg transition ${
-                  viewMode === 'list' ? 'bg-white shadow-xs text-blue-600 font-bold' : 'text-slate-500'
-                }`}
+                className="p-1.5 rounded-lg transition"
+                style={{
+                  backgroundColor: viewMode === 'list' ? 'var(--surface)' : 'transparent',
+                  color: viewMode === 'list' ? 'var(--primary)' : 'var(--text-muted)',
+                }}
                 title="List View"
               >
                 <List className="w-4 h-4" />
@@ -223,29 +255,41 @@ export default function MyDesignsPage() {
             {sortedDesigns.map((tmpl) => (
               <div
                 key={tmpl.id}
-                className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-xs hover:border-slate-300 transition flex flex-col justify-between"
+                className="rounded-2xl p-5 space-y-4 border shadow-xs transition flex flex-col justify-between"
+                style={{
+                  backgroundColor: 'var(--surface)',
+                  borderColor: 'var(--border)',
+                }}
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full">
+                    <span
+                      className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border"
+                      style={{
+                        backgroundColor: 'var(--primary-light)',
+                        borderColor: 'var(--primary-border)',
+                        color: 'var(--primary)',
+                      }}
+                    >
                       {tmpl.category}
                     </span>
-                    <span className="text-[10px] text-slate-400 uppercase font-mono">{tmpl.orientation}</span>
+                    <span className="text-[10px] uppercase font-mono" style={{ color: 'var(--text-muted)' }}>{tmpl.orientation}</span>
                   </div>
 
-                  <h3 className="font-bold text-sm text-slate-900">{tmpl.name}</h3>
-                  <p className="text-xs text-slate-600 line-clamp-2">{tmpl.description}</p>
-                  <p className="text-[10px] text-slate-400">
+                  <h3 className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>{tmpl.name}</h3>
+                  <p className="text-xs line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{tmpl.description}</p>
+                  <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
                     {tmpl.elements.length} elements • Updated {new Date(tmpl.updatedAt).toLocaleDateString()}
                   </p>
                 </div>
 
                 {/* Grid Card Actions */}
-                <div className="border-t border-slate-100 pt-3 space-y-2">
+                <div className="pt-3 space-y-2 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
                   <div className="flex items-center gap-2">
                     <Link
                       href={`/studio/editor/${tmpl.id}`}
-                      className="flex-1 flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs shadow-xs transition"
+                      className="flex-1 flex items-center justify-center gap-1.5 text-white font-bold py-2 rounded-lg text-xs shadow-xs transition"
+                      style={{ backgroundColor: 'var(--primary)' }}
                     >
                       <Edit3 className="w-3.5 h-3.5" />
                       <span>Open Editor</span>
@@ -253,32 +297,38 @@ export default function MyDesignsPage() {
 
                     <Link
                       href={`/studio/preview/${tmpl.id}`}
-                      className="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200"
+                      className="p-2 rounded-lg border transition"
+                      style={{
+                        backgroundColor: 'var(--surface-subtle)',
+                        borderColor: 'var(--border)',
+                        color: 'var(--text-secondary)',
+                      }}
                       title="Preview Sample"
                     >
                       <Eye className="w-4 h-4" />
                     </Link>
                   </div>
 
-                  <div className="flex items-center justify-between pt-1 text-xs text-slate-500">
+                  <div className="flex items-center justify-between pt-1 text-xs">
                     <button
                       onClick={() => {
                         setRenameTarget(tmpl);
                         setNewNameInput(tmpl.name);
                       }}
-                      className="hover:text-slate-900 font-semibold"
+                      className="font-semibold transition"
+                      style={{ color: 'var(--text-secondary)' }}
                     >
                       Rename
                     </button>
-                    <button onClick={() => handleDuplicate(tmpl.id)} className="hover:text-slate-900 font-semibold">
+                    <button onClick={() => handleDuplicate(tmpl.id)} className="font-semibold transition" style={{ color: 'var(--text-secondary)' }}>
                       Duplicate
                     </button>
-                    <button onClick={() => handleExport(tmpl.id)} className="hover:text-slate-900 font-semibold">
+                    <button onClick={() => handleExport(tmpl.id)} className="font-semibold transition" style={{ color: 'var(--text-secondary)' }}>
                       Export
                     </button>
                     <button
                       onClick={() => setDeleteTarget(tmpl)}
-                      className="text-rose-600 hover:text-rose-700 font-semibold"
+                      className="text-rose-400 hover:text-rose-300 font-semibold"
                     >
                       Delete
                     </button>
@@ -288,9 +338,22 @@ export default function MyDesignsPage() {
             ))}
           </div>
         ) : (
-          <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
-            <table className="w-full text-left text-xs text-slate-700">
-              <thead className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+          <div
+            className="rounded-2xl overflow-hidden border shadow-xs"
+            style={{
+              backgroundColor: 'var(--surface)',
+              borderColor: 'var(--border)',
+            }}
+          >
+            <table className="w-full text-left text-xs">
+              <thead
+                className="border-b text-[11px] font-bold uppercase tracking-wider"
+                style={{
+                  backgroundColor: 'var(--surface-subtle)',
+                  borderColor: 'var(--border)',
+                  color: 'var(--text-muted)',
+                }}
+              >
                 <tr>
                   <th className="py-3 px-4">Design Name</th>
                   <th className="py-3 px-4">Category</th>
@@ -299,35 +362,57 @@ export default function MyDesignsPage() {
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y" style={{ borderColor: 'var(--border-subtle)' }}>
                 {sortedDesigns.map((tmpl) => (
-                  <tr key={tmpl.id} className="hover:bg-slate-50/80 transition">
-                    <td className="py-3 px-4 font-bold text-slate-900">{tmpl.name}</td>
+                  <tr
+                    key={tmpl.id}
+                    className="transition"
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                  >
+                    <td className="py-3 px-4 font-bold" style={{ color: 'var(--text-primary)' }}>{tmpl.name}</td>
                     <td className="py-3 px-4">
-                      <span className="text-[10px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">
+                      <span
+                        className="text-[10px] font-bold px-2 py-0.5 rounded-full border"
+                        style={{
+                          backgroundColor: 'var(--primary-light)',
+                          borderColor: 'var(--primary-border)',
+                          color: 'var(--primary)',
+                        }}
+                      >
                         {tmpl.category}
                       </span>
                     </td>
-                    <td className="py-3 px-4 uppercase font-mono text-slate-500">{tmpl.orientation}</td>
-                    <td className="py-3 px-4 text-slate-500">{new Date(tmpl.updatedAt).toLocaleDateString()}</td>
+                    <td className="py-3 px-4 uppercase font-mono" style={{ color: 'var(--text-muted)' }}>{tmpl.orientation}</td>
+                    <td className="py-3 px-4" style={{ color: 'var(--text-muted)' }}>{new Date(tmpl.updatedAt).toLocaleDateString()}</td>
                     <td className="py-3 px-4 text-right space-x-2">
                       <Link
                         href={`/studio/editor/${tmpl.id}`}
-                        className="inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-3 rounded-lg text-xs"
+                        className="inline-flex items-center gap-1 text-white font-bold py-1.5 px-3 rounded-lg text-xs"
+                        style={{ backgroundColor: 'var(--primary)' }}
                       >
                         <Edit3 className="w-3 h-3" />
                         <span>Edit</span>
                       </Link>
                       <button
                         onClick={() => handleDuplicate(tmpl.id)}
-                        className="p-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        className="p-1.5 rounded-lg border transition"
+                        style={{
+                          backgroundColor: 'var(--surface-subtle)',
+                          borderColor: 'var(--border)',
+                          color: 'var(--text-secondary)',
+                        }}
                         title="Duplicate"
                       >
                         <Copy className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => setDeleteTarget(tmpl)}
-                        className="p-1.5 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100"
+                        className="p-1.5 rounded-lg bg-rose-950/40 text-rose-300 hover:bg-rose-900/60 border border-rose-800/50"
                         title="Delete"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -340,13 +425,26 @@ export default function MyDesignsPage() {
           </div>
         )
       ) : (
-        <div className="bg-white border border-slate-200 p-12 rounded-2xl text-center space-y-4 shadow-xs">
-          <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 text-slate-500 flex items-center justify-center mx-auto">
+        <div
+          className="p-12 rounded-2xl text-center space-y-4 border shadow-xs"
+          style={{
+            backgroundColor: 'var(--surface)',
+            borderColor: 'var(--border)',
+          }}
+        >
+          <div
+            className="w-12 h-12 rounded-xl border flex items-center justify-center mx-auto"
+            style={{
+              backgroundColor: 'var(--surface-subtle)',
+              borderColor: 'var(--border)',
+              color: 'var(--text-muted)',
+            }}
+          >
             <Palette className="w-6 h-6" />
           </div>
           <div className="space-y-1 max-w-sm mx-auto">
-            <h3 className="text-base font-bold text-slate-900">No Studio Designs Found</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <h3 className="text-base font-bold" style={{ color: 'var(--text-primary)' }}>No Studio Designs Found</h3>
+            <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>
               Create a custom certificate design from scratch or import a background layout from Canva or Figma.
             </p>
           </div>
@@ -360,7 +458,8 @@ export default function MyDesignsPage() {
             </Link>
             <Link
               href="/studio/new"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-lg text-xs"
+              className="text-white font-bold py-2.5 px-4 rounded-lg text-xs"
+              style={{ backgroundColor: 'var(--primary)' }}
             >
               Create Blank Design
             </Link>
@@ -370,35 +469,52 @@ export default function MyDesignsPage() {
 
       {/* Rename Modal */}
       {renameTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div className="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-bold text-base text-slate-900">Rename Design</h3>
-              <button onClick={() => setRenameTarget(null)} className="text-slate-400 hover:text-slate-600">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div
+            className="rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4 border"
+            style={{
+              backgroundColor: 'var(--surface-elevated)',
+              borderColor: 'var(--border-strong)',
+            }}
+          >
+            <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: 'var(--border-subtle)' }}>
+              <h3 className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>Rename Design</h3>
+              <button onClick={() => setRenameTarget(null)} className="text-slate-400 hover:text-slate-200">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-2">
-              <label className="block text-xs font-bold text-slate-800">Design Name</label>
+              <label className="block text-xs font-bold" style={{ color: 'var(--text-secondary)' }}>Design Name</label>
               <input
                 type="text"
                 value={newNameInput}
                 onChange={(e) => setNewNameInput(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
+                className="w-full rounded-xl px-4 py-2.5 text-xs focus:outline-none border transition"
+                style={{
+                  backgroundColor: 'var(--surface-subtle)',
+                  borderColor: 'var(--border)',
+                  color: 'var(--text-primary)',
+                }}
               />
             </div>
 
             <div className="flex justify-end gap-3 pt-2">
               <button
                 onClick={() => setRenameTarget(null)}
-                className="px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg border border-slate-200"
+                className="px-4 py-2 text-xs font-semibold rounded-lg border transition"
+                style={{
+                  backgroundColor: 'var(--surface-subtle)',
+                  borderColor: 'var(--border)',
+                  color: 'var(--text-secondary)',
+                }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirmRename}
-                className="px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs"
+                className="px-4 py-2 text-xs font-bold text-white rounded-lg shadow-xs transition"
+                style={{ backgroundColor: 'var(--primary)' }}
               >
                 Save Name
               </button>
@@ -409,33 +525,44 @@ export default function MyDesignsPage() {
 
       {/* Delete Confirmation Modal */}
       {deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div className="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2 text-rose-600">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div
+            className="rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4 border"
+            style={{
+              backgroundColor: 'var(--surface-elevated)',
+              borderColor: 'var(--border-strong)',
+            }}
+          >
+            <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: 'var(--border-subtle)' }}>
+              <div className="flex items-center gap-2 text-rose-400">
                 <AlertTriangle className="w-5 h-5" />
-                <h3 className="font-bold text-base text-slate-900">Delete Studio Design</h3>
+                <h3 className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>Delete Studio Design</h3>
               </div>
-              <button onClick={() => setDeleteTarget(null)} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => setDeleteTarget(null)} className="text-slate-400 hover:text-slate-200">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Are you sure you want to delete <span className="font-bold text-slate-900">"{deleteTarget.name}"</span>?
+            <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+              Are you sure you want to delete <span className="font-bold" style={{ color: 'var(--text-primary)' }}>"{deleteTarget.name}"</span>?
               This action will remove the local design layout and stored image background.
             </p>
 
             <div className="flex justify-end gap-3 pt-2">
               <button
                 onClick={() => setDeleteTarget(null)}
-                className="px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg border border-slate-200"
+                className="px-4 py-2 text-xs font-semibold rounded-lg border transition"
+                style={{
+                  backgroundColor: 'var(--surface-subtle)',
+                  borderColor: 'var(--border)',
+                  color: 'var(--text-secondary)',
+                }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirmDelete}
-                className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-xs"
+                className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-xs transition"
               >
                 Confirm Delete
               </button>

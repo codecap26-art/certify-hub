@@ -239,7 +239,13 @@ export default function TemplatesPage() {
       />
 
       {/* 4 Method Tabs Header */}
-      <div className="bg-white border border-slate-200 p-2 rounded-2xl flex flex-wrap items-center gap-2 shadow-xs">
+      <div
+        className="p-2 rounded-2xl flex flex-wrap items-center gap-2 border shadow-xs"
+        style={{
+          backgroundColor: 'var(--surface)',
+          borderColor: 'var(--border)',
+        }}
+      >
         {[
           { id: 'built-in', label: 'Method 1: Built-in Templates' },
           { id: 'imported', label: 'Method 2: Imported Canva/PDF' },
@@ -249,11 +255,11 @@ export default function TemplatesPage() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as TabType)}
-            className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition text-center min-w-[140px] ${
-              activeTab === tab.id
-                ? 'bg-blue-600 text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-            }`}
+            className="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition text-center min-w-[140px]"
+            style={{
+              backgroundColor: activeTab === tab.id ? 'var(--primary)' : 'transparent',
+              color: activeTab === tab.id ? 'var(--text-inverse)' : 'var(--text-secondary)',
+            }}
           >
             {tab.label}
           </button>
@@ -264,7 +270,7 @@ export default function TemplatesPage() {
       {activeTab === 'built-in' && (
         <div className="space-y-6">
           <div className="space-y-3">
-            <h3 className="font-bold text-xs text-slate-700 uppercase tracking-wider">
+            <h3 className="font-bold text-xs uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
               Specialized Role & Achievement Templates (Winner, Runner, Participated)
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -272,11 +278,12 @@ export default function TemplatesPage() {
                 <div
                   key={tmpl.id}
                   onClick={() => setSelectedBuiltInId(tmpl.id)}
-                  className={`p-4 rounded-2xl border cursor-pointer transition flex flex-col justify-between space-y-3 ${
-                    selectedBuiltInId === tmpl.id
-                      ? 'bg-blue-50/80 border-blue-500 shadow-sm ring-2 ring-blue-500/20'
-                      : 'bg-white border-slate-200 hover:border-slate-300 shadow-xs'
-                  }`}
+                  className="p-4 rounded-2xl border cursor-pointer transition flex flex-col justify-between space-y-3"
+                  style={{
+                    backgroundColor: selectedBuiltInId === tmpl.id ? 'var(--surface-elevated)' : 'var(--surface)',
+                    borderColor: selectedBuiltInId === tmpl.id ? 'var(--primary)' : 'var(--border)',
+                    boxShadow: selectedBuiltInId === tmpl.id ? '0 0 0 2px var(--primary)' : 'var(--shadow-xs)',
+                  }}
                 >
                   <div className="space-y-2">
                     <div
@@ -287,21 +294,28 @@ export default function TemplatesPage() {
                     </div>
                     <div>
                       <div className="flex items-center justify-between">
-                        <h4 className="font-bold text-xs text-slate-900 truncate">{tmpl.name}</h4>
+                        <h4 className="font-bold text-xs truncate" style={{ color: 'var(--text-primary)' }}>{tmpl.name}</h4>
                         {selectedBuiltInId === tmpl.id && (
-                          <span className="flex items-center gap-0.5 text-[9px] font-bold text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded-full">
+                          <span
+                            className="flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+                            style={{
+                              backgroundColor: 'var(--primary-light)',
+                              color: 'var(--primary)',
+                            }}
+                          >
                             <Check className="w-3 h-3" />
                           </span>
                         )}
                       </div>
-                      <p className="text-[10px] text-slate-500 line-clamp-2 mt-0.5">{tmpl.description}</p>
+                      <p className="text-[10px] line-clamp-2 mt-0.5" style={{ color: 'var(--text-muted)' }}>{tmpl.description}</p>
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-slate-100 space-y-1.5">
+                  <div className="pt-2 space-y-1.5 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
                     <Link
                       href={`/generate?templateId=${tmpl.id}`}
-                      className="w-full flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-3 rounded-lg text-[11px] transition shadow-xs"
+                      className="w-full flex items-center justify-center gap-1.5 text-white font-bold py-1.5 px-3 rounded-lg text-[11px] transition shadow-xs"
+                      style={{ backgroundColor: 'var(--primary)' }}
                       onClick={(e) => e.stopPropagation()}
                     >
                       <span>Use in Generator</span>
@@ -312,9 +326,14 @@ export default function TemplatesPage() {
                         e.stopPropagation();
                         handleDuplicateBuiltIn(tmpl.id);
                       }}
-                      className="w-full flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-1.5 px-3 rounded-lg text-[11px] border border-slate-200 transition"
+                      className="w-full flex items-center justify-center gap-1.5 font-semibold py-1.5 px-3 rounded-lg text-[11px] border transition"
+                      style={{
+                        backgroundColor: 'var(--surface-subtle)',
+                        borderColor: 'var(--border)',
+                        color: 'var(--text-primary)',
+                      }}
                     >
-                      <Palette className="w-3.5 h-3.5 text-blue-600" />
+                      <Palette className="w-3.5 h-3.5" style={{ color: 'var(--primary)' }} />
                       <span>Customize in Studio</span>
                     </button>
                   </div>
@@ -323,8 +342,8 @@ export default function TemplatesPage() {
             </div>
           </div>
 
-          <div className="space-y-3 pt-4 border-t border-slate-200">
-            <h3 className="font-bold text-xs text-slate-700 uppercase tracking-wider">
+          <div className="space-y-3 pt-4 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+            <h3 className="font-bold text-xs uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
               Classic Built-in Vector Themes
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -332,11 +351,12 @@ export default function TemplatesPage() {
                 <div
                   key={tmpl.id}
                   onClick={() => setSelectedBuiltInId(tmpl.id)}
-                  className={`p-4 rounded-2xl border cursor-pointer transition flex flex-col justify-between space-y-3 ${
-                    selectedBuiltInId === tmpl.id
-                      ? 'bg-blue-50/80 border-blue-500 shadow-sm ring-2 ring-blue-500/20'
-                      : 'bg-white border-slate-200 hover:border-slate-300 shadow-xs'
-                  }`}
+                  className="p-4 rounded-2xl border cursor-pointer transition flex flex-col justify-between space-y-3"
+                  style={{
+                    backgroundColor: selectedBuiltInId === tmpl.id ? 'var(--surface-elevated)' : 'var(--surface)',
+                    borderColor: selectedBuiltInId === tmpl.id ? 'var(--primary)' : 'var(--border)',
+                    boxShadow: selectedBuiltInId === tmpl.id ? '0 0 0 2px var(--primary)' : 'var(--shadow-xs)',
+                  }}
                 >
                   <div className="space-y-2">
                     <div
@@ -347,21 +367,28 @@ export default function TemplatesPage() {
                     </div>
                     <div>
                       <div className="flex items-center justify-between">
-                        <h4 className="font-bold text-xs text-slate-900">{tmpl.name}</h4>
+                        <h4 className="font-bold text-xs" style={{ color: 'var(--text-primary)' }}>{tmpl.name}</h4>
                         {selectedBuiltInId === tmpl.id && (
-                          <span className="flex items-center gap-1 text-[10px] font-bold text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded-full">
+                          <span
+                            className="flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+                            style={{
+                              backgroundColor: 'var(--primary-light)',
+                              color: 'var(--primary)',
+                            }}
+                          >
                             <Check className="w-3 h-3" />
                           </span>
                         )}
                       </div>
-                      <p className="text-[10px] text-slate-500 line-clamp-2 mt-0.5">{tmpl.description}</p>
+                      <p className="text-[10px] line-clamp-2 mt-0.5" style={{ color: 'var(--text-muted)' }}>{tmpl.description}</p>
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-slate-100 space-y-1.5">
+                  <div className="pt-2 space-y-1.5 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
                     <Link
                       href={`/generate?templateId=${tmpl.id}`}
-                      className="w-full flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-3 rounded-lg text-[11px] transition shadow-xs"
+                      className="w-full flex items-center justify-center gap-1.5 text-white font-bold py-1.5 px-3 rounded-lg text-[11px] transition shadow-xs"
+                      style={{ backgroundColor: 'var(--primary)' }}
                       onClick={(e) => e.stopPropagation()}
                     >
                       <span>Use in Generator</span>
@@ -372,9 +399,14 @@ export default function TemplatesPage() {
                         e.stopPropagation();
                         handleDuplicateBuiltIn(tmpl.id);
                       }}
-                      className="w-full flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-1.5 px-3 rounded-lg text-[11px] border border-slate-200 transition"
+                      className="w-full flex items-center justify-center gap-1.5 font-semibold py-1.5 px-3 rounded-lg text-[11px] border transition"
+                      style={{
+                        backgroundColor: 'var(--surface-subtle)',
+                        borderColor: 'var(--border)',
+                        color: 'var(--text-primary)',
+                      }}
                     >
-                      <Palette className="w-3.5 h-3.5 text-blue-600" />
+                      <Palette className="w-3.5 h-3.5" style={{ color: 'var(--primary)' }} />
                       <span>Customize in Studio</span>
                     </button>
                   </div>
@@ -383,11 +415,17 @@ export default function TemplatesPage() {
             </div>
           </div>
 
-          <div className="bg-white border border-slate-200 p-6 rounded-2xl space-y-4 shadow-xs">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <span className="text-xs font-bold text-slate-900">
+          <div
+            className="p-6 rounded-2xl space-y-4 border shadow-xs"
+            style={{
+              backgroundColor: 'var(--surface)',
+              borderColor: 'var(--border)',
+            }}
+          >
+            <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: 'var(--border-subtle)' }}>
+              <span className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>
                 Active Preview Template:{' '}
-                <span className="text-blue-600 font-mono">
+                <span className="font-mono" style={{ color: 'var(--primary)' }}>
                   {BUILT_IN_TEMPLATES.find((t) => t.id === selectedBuiltInId)?.name ||
                     TEMPLATES.find((t) => t.id === selectedBuiltInId)?.name ||
                     selectedBuiltInId}
@@ -397,14 +435,20 @@ export default function TemplatesPage() {
               <div className="flex items-center gap-2">
                 <Link
                   href={`/studio/editor/${selectedBuiltInId}`}
-                  className="text-xs font-bold text-slate-700 hover:text-blue-600 flex items-center gap-1 bg-slate-100 px-3 py-1.5 rounded-lg transition"
+                  className="text-xs font-bold flex items-center gap-1 px-3 py-1.5 rounded-lg border transition"
+                  style={{
+                    backgroundColor: 'var(--surface-subtle)',
+                    borderColor: 'var(--border)',
+                    color: 'var(--text-primary)',
+                  }}
                 >
-                  <Palette className="w-3.5 h-3.5 text-blue-600" />
+                  <Palette className="w-3.5 h-3.5" style={{ color: 'var(--primary)' }} />
                   <span>Customize in Studio</span>
                 </Link>
                 <Link
                   href={`/generate?templateId=${selectedBuiltInId}`}
-                  className="text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 flex items-center gap-1 px-3 py-1.5 rounded-lg transition shadow-xs"
+                  className="text-xs font-bold text-white flex items-center gap-1 px-3 py-1.5 rounded-lg transition shadow-xs"
+                  style={{ backgroundColor: 'var(--primary)' }}
                 >
                   <span>Use in Bulk Generator</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -412,7 +456,13 @@ export default function TemplatesPage() {
               </div>
             </div>
 
-            <div className="bg-slate-100 p-4 rounded-xl border border-slate-200 flex justify-center">
+            <div
+              className="p-4 rounded-xl border flex justify-center"
+              style={{
+                backgroundColor: 'var(--surface-subtle)',
+                borderColor: 'var(--border-subtle)',
+              }}
+            >
               <CertificateRenderer certificate={sampleCertificate} templateId={selectedBuiltInId as TemplateId} />
             </div>
           </div>
@@ -423,24 +473,40 @@ export default function TemplatesPage() {
       {activeTab !== 'built-in' && (
         <div className="space-y-4">
           {/* Search & Filter Bar */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white border border-slate-200 p-3.5 rounded-2xl shadow-xs">
+          <div
+            className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-2xl border shadow-xs"
+            style={{
+              backgroundColor: 'var(--surface)',
+              borderColor: 'var(--border)',
+            }}
+          >
             <div className="relative flex-1">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-muted)' }} />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search custom templates..."
-                className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-800 focus:outline-none"
+                className="w-full rounded-xl pl-10 pr-4 py-2 text-xs border focus:outline-none transition"
+                style={{
+                  backgroundColor: 'var(--surface-subtle)',
+                  borderColor: 'var(--border)',
+                  color: 'var(--text-primary)',
+                }}
               />
             </div>
 
             <div className="flex items-center gap-2">
-              <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+              <Filter className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--text-muted)' }} />
               <select
                 value={orientationFilter}
                 onChange={(e) => setOrientationFilter(e.target.value)}
-                className="bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-xl px-3 py-2 focus:outline-none"
+                className="text-xs rounded-xl px-3 py-2 border focus:outline-none transition"
+                style={{
+                  backgroundColor: 'var(--surface-subtle)',
+                  borderColor: 'var(--border)',
+                  color: 'var(--text-primary)',
+                }}
               >
                 <option value="ALL">All Orientations</option>
                 <option value="landscape">Landscape</option>
@@ -454,26 +520,38 @@ export default function TemplatesPage() {
               {filteredCustomTemplates.map((tmpl) => (
                 <div
                   key={tmpl.id}
-                  className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-xs hover:border-slate-300 transition flex flex-col justify-between"
+                  className="rounded-2xl p-5 space-y-4 border shadow-xs transition flex flex-col justify-between"
+                  style={{
+                    backgroundColor: 'var(--surface)',
+                    borderColor: 'var(--border)',
+                  }}
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full">
+                      <span
+                        className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border"
+                        style={{
+                          backgroundColor: 'var(--primary-light)',
+                          borderColor: 'var(--primary-border)',
+                          color: 'var(--primary)',
+                        }}
+                      >
                         {tmpl.category}
                       </span>
-                      <span className="text-[10px] text-slate-400 uppercase font-mono">{tmpl.orientation}</span>
+                      <span className="text-[10px] uppercase font-mono" style={{ color: 'var(--text-muted)' }}>{tmpl.orientation}</span>
                     </div>
 
-                    <h3 className="font-bold text-sm text-slate-900">{tmpl.name}</h3>
-                    <p className="text-xs text-slate-600 line-clamp-2">{tmpl.description}</p>
-                    <p className="text-[10px] text-slate-400">{tmpl.elements.length} elements</p>
+                    <h3 className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>{tmpl.name}</h3>
+                    <p className="text-xs line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{tmpl.description}</p>
+                    <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{tmpl.elements.length} elements</p>
                   </div>
 
                   {/* Template Card Controls */}
-                  <div className="border-t border-slate-100 pt-3 flex items-center justify-between gap-2">
+                  <div className="pt-3 flex items-center justify-between gap-2 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
                     <Link
                       href={`/studio/editor/${tmpl.id}`}
-                      className="flex-1 flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs shadow-xs transition"
+                      className="flex-1 flex items-center justify-center gap-1.5 text-white font-bold py-2 rounded-lg text-xs shadow-xs transition"
+                      style={{ backgroundColor: 'var(--primary)' }}
                     >
                       <Edit3 className="w-3.5 h-3.5" />
                       <span>Edit in Studio</span>
@@ -481,7 +559,12 @@ export default function TemplatesPage() {
 
                     <button
                       onClick={() => handleDuplicate(tmpl.id)}
-                      className="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200"
+                      className="p-2 rounded-lg border transition"
+                      style={{
+                        backgroundColor: 'var(--surface-subtle)',
+                        borderColor: 'var(--border)',
+                        color: 'var(--text-secondary)',
+                      }}
                       title="Duplicate"
                     >
                       <Copy className="w-4 h-4" />
@@ -489,7 +572,12 @@ export default function TemplatesPage() {
 
                     <button
                       onClick={() => handleExport(tmpl.id)}
-                      className="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200"
+                      className="p-2 rounded-lg border transition"
+                      style={{
+                        backgroundColor: 'var(--surface-subtle)',
+                        borderColor: 'var(--border)',
+                        color: 'var(--text-secondary)',
+                      }}
                       title="Export Package"
                     >
                       <Download className="w-4 h-4" />
@@ -497,7 +585,7 @@ export default function TemplatesPage() {
 
                     <button
                       onClick={() => handleDelete(tmpl.id)}
-                      className="p-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200"
+                      className="p-2 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/50 transition"
                       title="Delete"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -507,13 +595,26 @@ export default function TemplatesPage() {
               ))}
             </div>
           ) : (
-            <div className="bg-white border border-slate-200 p-12 rounded-2xl text-center space-y-4 shadow-xs">
-              <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 text-slate-500 flex items-center justify-center mx-auto">
+            <div
+              className="p-12 rounded-2xl text-center space-y-4 border shadow-xs"
+              style={{
+                backgroundColor: 'var(--surface)',
+                borderColor: 'var(--border)',
+              }}
+            >
+              <div
+                className="w-12 h-12 rounded-xl border flex items-center justify-center mx-auto"
+                style={{
+                  backgroundColor: 'var(--surface-subtle)',
+                  borderColor: 'var(--border)',
+                  color: 'var(--text-muted)',
+                }}
+              >
                 <Layers className="w-6 h-6" />
               </div>
               <div className="space-y-1 max-w-sm mx-auto">
-                <h3 className="text-base font-bold text-slate-900">No Custom Templates Found</h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <h3 className="text-base font-bold" style={{ color: 'var(--text-primary)' }}>No Custom Templates Found</h3>
+                <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                   Import a Canva design background, generate with Smart Assistant, or create a layout from scratch.
                 </p>
               </div>
@@ -521,13 +622,14 @@ export default function TemplatesPage() {
               <div className="flex justify-center gap-3 pt-2">
                 <Link
                   href="/studio/import"
-                  className="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-4 rounded-lg text-xs"
+                  className="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-4 rounded-lg text-xs shadow-xs transition"
                 >
                   Import Design
                 </Link>
                 <Link
                   href="/studio/new"
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-lg text-xs"
+                  className="text-white font-bold py-2.5 px-4 rounded-lg text-xs shadow-xs transition"
+                  style={{ backgroundColor: 'var(--primary)' }}
                 >
                   Create from Scratch
                 </Link>

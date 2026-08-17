@@ -8,7 +8,7 @@
 @layer base {
 
   /* ══════════════════════════════════════════════
-     DEFAULT THEME — Modern Indigo Light (Clean Professional)
+     DEFAULT THEME — Clean Professional White UI
      ══════════════════════════════════════════════ */
   :root {
     /* Primary Brand Colors */
@@ -191,7 +191,7 @@
   }
 
   /* ══════════════════════════════════════════════
-     🌊 MODERN INDIGO LIGHT THEME
+     🌊 MODERN INDIGO LIGHT (CLEAN WHITE)
      ══════════════════════════════════════════════ */
   [data-theme="indigo"] {
     --primary:          #2563EB;
@@ -201,14 +201,15 @@
     --primary-border:   #BFDBFE;
     --primary-ring:     rgba(37, 99, 235, 0.18);
 
-    --secondary:        #06B6D4;
-    --secondary-hover:  #0891B2;
-    --secondary-light:  #ECFEFF;
+    --secondary:        #0284C7;
+    --secondary-hover:  #0369A1;
+    --secondary-light:  #F0F9FF;
 
     --text-primary:     #0F172A;
     --text-secondary:   #334155;
     --text-muted:       #64748B;
     --text-placeholder: #94A3B8;
+    --text-inverse:     #FFFFFF;
 
     --background:       #F8FAFC;
     --surface:          #FFFFFF;
@@ -219,6 +220,9 @@
     --border:           #E2E8F0;
     --border-strong:    #CBD5E1;
     --border-subtle:    #F1F5F9;
+
+    --shadow-focus: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    --shadow-primary: 0 4px 12px rgba(37, 99, 235, 0.25);
   }
 
   /* ══════════════════════════════════════════════
