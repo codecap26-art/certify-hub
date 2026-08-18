@@ -1,8 +1,18 @@
 import { CertificateRecord, EventItem, Organization, Recipient } from '@/types';
+import {
+  DistributionCampaign,
+  EmailDeliveryJob,
+  EmailAuditLogEntry,
+  RecipientNotification,
+} from '@/types/distribution';
 import { defaultOrganization, organizationRepository } from './storage/organizationRepository';
 import { eventRepository } from './storage/eventRepository';
 import { recipientRepository } from './storage/recipientRepository';
 import { certificateRepository } from './storage/certificateRepository';
+import {
+  distributionRepository,
+  BUILT_IN_EMAIL_TEMPLATES,
+} from './storage/distributionRepository';
 import { clearAllCertifyHubKeys } from './storage/repository';
 
 export const demoOrganization: Organization = { ...defaultOrganization };
@@ -37,6 +47,21 @@ export const demoEvents: EventItem[] = [
     status: 'Completed',
     createdAt: '2026-01-01T10:00:00.000Z',
     updatedAt: '2026-03-01T10:00:00.000Z',
+  },
+  {
+    id: 'evt-ai-2026',
+    name: 'AI & Machine Learning Workshop 2026',
+    eventType: 'Workshop',
+    description:
+      'Deep dive into modern LLM applications, embeddings, agentic workflows, and vision models.',
+    startDate: '2026-04-15',
+    endDate: '2026-04-17',
+    location: 'Tech Innovation Centre, ABC Campus',
+    certificateType: 'Achievement',
+    coordinatorName: 'Dr. P. Venkatesh',
+    status: 'Active',
+    createdAt: '2026-04-01T09:00:00.000Z',
+    updatedAt: '2026-04-01T09:00:00.000Z',
   },
 ];
 
@@ -173,19 +198,248 @@ export const demoRecipients: Recipient[] = [
   },
 ];
 
-export const demoCertificates: CertificateRecord[] = [
+export const demoCertificates: CertificateRecord[] = demoRecipients.map((rec, index) => ({
+  id: `cert-demo-${String(index + 1).padStart(3, '0')}`,
+  certificateCode: `ABC-REACT-2026-${String(index + 101).padStart(4, '0')}`,
+  verificationToken: `token-react-2026-rec-${index + 1}`,
+  eventId: 'evt-react-2026',
+  recipientId: rec.id,
+  templateId: 'modern-blue',
+  organizationSnapshot: demoOrganization,
+  eventSnapshot: demoEvents[0],
+  recipientSnapshot: rec,
+  status: 'Valid',
+  generatedAt: '2026-03-12T16:30:00.000Z',
+}));
+
+export const demoCampaigns: DistributionCampaign[] = [
   {
-    id: 'cert-demo-001',
-    certificateCode: 'ABC-REACT-2026-A7B9C2',
-    verificationToken: '550e8400-e29b-41d4-a716-446655440000',
+    id: 'camp-ai-2026',
+    institutionId: 'org-abc-college',
+    name: 'AI Workshop 2026 Certificate Distribution',
+    eventId: 'evt-ai-2026',
+    eventName: 'AI & Machine Learning Workshop 2026',
+    templateId: 'tmpl-workshop-completion',
+    subject: 'Your AI Workshop 2026 Certificate of Achievement',
+    deliveryMethod: 'both',
+    status: 'completed',
+    startedAt: '2026-04-18T10:00:00.000Z',
+    completedAt: '2026-04-18T10:05:00.000Z',
+    createdAt: '2026-04-18T09:30:00.000Z',
+    createdBy: 'admin@abccollege.edu',
+    totalRecipients: 427,
+    sentCount: 420,
+    deliveredCount: 415,
+    openedCount: 382,
+    failedCount: 7,
+    queuedCount: 5,
+    batchSize: 100,
+    rateLimitPerSecond: 10,
+    emailConfig: {
+      fromName: 'ABC Engineering College — Certifications',
+      replyTo: 'contact@abccollege.edu',
+      subject: 'Your AI Workshop 2026 Certificate of Achievement',
+      body: '<p>Hello <strong>{{recipient.name}}</strong>,</p><p>Congratulations on completing the AI Workshop! Your official certificate is attached.</p>',
+      ctaButtonText: 'Download Certificate PDF',
+      includeLogo: true,
+      includeSignatory: true,
+      footerText: 'ABC Engineering College — Digital Credential Delivery',
+    },
+  },
+  {
+    id: 'camp-hackathon-2026',
+    institutionId: 'org-abc-college',
+    name: 'Hackathon 2026 Certificates',
     eventId: 'evt-react-2026',
+    eventName: 'React Development Workshop 2026',
+    templateId: 'tmpl-cert-delivery-default',
+    subject: 'Your Hackathon 2026 Certificate',
+    deliveryMethod: 'attachment',
+    status: 'completed',
+    startedAt: '2026-03-15T14:00:00.000Z',
+    completedAt: '2026-03-15T14:03:00.000Z',
+    createdAt: '2026-03-15T13:45:00.000Z',
+    createdBy: 'admin@abccollege.edu',
+    totalRecipients: 218,
+    sentCount: 218,
+    deliveredCount: 218,
+    openedCount: 204,
+    failedCount: 0,
+    queuedCount: 0,
+    batchSize: 100,
+    rateLimitPerSecond: 10,
+    emailConfig: {
+      fromName: 'CertifyHub Issuer',
+      replyTo: 'contact@abccollege.edu',
+      subject: 'Your Hackathon 2026 Certificate',
+      body: '<p>Hello <strong>{{recipient.name}}</strong>,</p><p>Your certificate has been issued.</p>',
+      ctaButtonText: 'View Certificate',
+      includeLogo: true,
+      includeSignatory: true,
+      footerText: 'ABC Engineering College',
+    },
+  },
+  {
+    id: 'camp-python-2026',
+    institutionId: 'org-abc-college',
+    name: 'Python Workshop Distribution',
+    eventId: 'evt-fullstack-2026',
+    eventName: 'Full-Stack Web Internship 2026',
+    templateId: 'tmpl-internship-completion',
+    subject: 'Python Workshop Certificate of Completion',
+    deliveryMethod: 'both',
+    status: 'processing',
+    startedAt: '2026-04-20T08:00:00.000Z',
+    createdAt: '2026-04-20T07:50:00.000Z',
+    createdBy: 'admin@abccollege.edu',
+    totalRecipients: 780,
+    sentCount: 761,
+    deliveredCount: 761,
+    openedCount: 512,
+    failedCount: 19,
+    queuedCount: 0,
+    batchSize: 100,
+    rateLimitPerSecond: 10,
+    emailConfig: {
+      fromName: 'Office of Academic Affairs',
+      replyTo: 'internships@abccollege.edu',
+      subject: 'Python Workshop Certificate of Completion',
+      body: '<p>Dear <strong>{{recipient.name}}</strong>,</p><p>Your certificate is ready.</p>',
+      ctaButtonText: 'Download Certificate',
+      includeLogo: true,
+      includeSignatory: true,
+      footerText: 'ABC Engineering College',
+    },
+  },
+];
+
+export const demoDeliveries: EmailDeliveryJob[] = [
+  {
+    id: 'job-subash-01',
+    campaignId: 'camp-hackathon-2026',
+    institutionId: 'org-abc-college',
     recipientId: 'rec-subash-01',
-    templateId: 'modern-blue',
-    organizationSnapshot: demoOrganization,
-    eventSnapshot: demoEvents[0],
-    recipientSnapshot: demoRecipients[0],
-    status: 'Valid',
-    generatedAt: '2026-03-12T16:30:00.000Z',
+    certificateId: 'cert-demo-001',
+    recipientName: 'Subash P',
+    email: 'subash@example.com',
+    registrationNumber: '23CS101',
+    department: 'Computer Science & Engineering',
+    status: 'DELIVERED',
+    providerMessageId: 'msg-mock-subash-01',
+    attemptCount: 1,
+    maxAttempts: 3,
+    queuedAt: '2026-03-15T14:00:00.000Z',
+    sentAt: '2026-03-15T14:00:02.000Z',
+    deliveredAt: '2026-03-15T14:00:04.000Z',
+    openedAt: '2026-03-15T14:15:00.000Z',
+    attachmentFilename: 'Subash_P_React_Development_Workshop_2026.pdf',
+  },
+  {
+    id: 'job-arun-02',
+    campaignId: 'camp-python-2026',
+    institutionId: 'org-abc-college',
+    recipientId: 'rec-arun-02',
+    certificateId: 'cert-demo-002',
+    recipientName: 'Arun Kumar',
+    email: 'wrong@email',
+    registrationNumber: '23CS102',
+    department: 'Computer Science & Engineering',
+    status: 'FAILED',
+    attemptCount: 1,
+    maxAttempts: 3,
+    lastError: 'Invalid email address format',
+    errorCategory: 'INVALID_EMAIL',
+    queuedAt: '2026-04-20T08:00:00.000Z',
+    lastAttemptAt: '2026-04-20T08:00:05.000Z',
+    attachmentFilename: 'Arun_Kumar_Full_Stack_Web_Internship_2026.pdf',
+  },
+  {
+    id: 'job-priya-03',
+    campaignId: 'camp-python-2026',
+    institutionId: 'org-abc-college',
+    recipientId: 'rec-priya-03',
+    certificateId: 'cert-demo-003',
+    recipientName: 'Priya S',
+    email: 'priya@example.com',
+    registrationNumber: '23CS103',
+    department: 'Information Technology',
+    status: 'FAILED',
+    attemptCount: 3,
+    maxAttempts: 3,
+    lastError: 'Provider rejected: Mailbox full or quota exceeded',
+    errorCategory: 'PROVIDER_REJECTED',
+    queuedAt: '2026-04-20T08:00:00.000Z',
+    lastAttemptAt: '2026-04-20T08:00:15.000Z',
+    attachmentFilename: 'Priya_S_Full_Stack_Web_Internship_2026.pdf',
+  },
+  {
+    id: 'job-kavin-06',
+    campaignId: 'camp-python-2026',
+    institutionId: 'org-abc-college',
+    recipientId: 'rec-kavin-06',
+    certificateId: 'cert-demo-006',
+    recipientName: 'Kavin R',
+    email: '',
+    registrationNumber: '23CS106',
+    department: 'Electronics & Communication',
+    status: 'FAILED',
+    attemptCount: 0,
+    maxAttempts: 3,
+    lastError: 'Missing recipient email address',
+    errorCategory: 'MISSING_EMAIL',
+    queuedAt: '2026-04-20T08:00:00.000Z',
+    attachmentFilename: 'Kavin_R_Full_Stack_Web_Internship_2026.pdf',
+  },
+];
+
+export const demoAuditLogs: EmailAuditLogEntry[] = [
+  {
+    id: 'audit-001',
+    institutionId: 'org-abc-college',
+    campaignId: 'camp-ai-2026',
+    action: 'CAMPAIGN_CREATED',
+    entityId: 'camp-ai-2026',
+    entityType: 'campaign',
+    user: 'admin@abccollege.edu',
+    details: 'Created campaign "AI Workshop 2026" with 427 recipients',
+    timestamp: '2026-04-18T09:30:00.000Z',
+  },
+  {
+    id: 'audit-002',
+    institutionId: 'org-abc-college',
+    campaignId: 'camp-ai-2026',
+    action: 'CAMPAIGN_STARTED',
+    entityId: 'camp-ai-2026',
+    entityType: 'campaign',
+    user: 'admin@abccollege.edu',
+    details: 'Started processing email queue in batches of 100',
+    timestamp: '2026-04-18T10:00:00.000Z',
+  },
+  {
+    id: 'audit-003',
+    institutionId: 'org-abc-college',
+    campaignId: 'camp-ai-2026',
+    action: 'CAMPAIGN_COMPLETED',
+    entityId: 'camp-ai-2026',
+    entityType: 'campaign',
+    user: 'system',
+    details: 'Campaign completed: 415 delivered, 7 failed, 5 pending',
+    timestamp: '2026-04-18T10:05:00.000Z',
+  },
+];
+
+export const demoNotifications: RecipientNotification[] = [
+  {
+    id: 'notif-demo-01',
+    recipientEmail: 'subash@example.com',
+    recipientId: 'rec-subash-01',
+    certificateId: 'cert-demo-001',
+    eventId: 'evt-react-2026',
+    eventName: 'React Development Workshop 2026',
+    title: 'New Certificate Available',
+    message: 'Your official certificate for "React Development Workshop 2026" is now available.',
+    isRead: false,
+    createdAt: '2026-03-15T14:05:00.000Z',
   },
 ];
 
@@ -196,6 +450,10 @@ export function seedDemoDataIfNeeded(): void {
     eventRepository.saveAll(demoEvents);
     recipientRepository.saveAll(demoRecipients);
     certificateRepository.saveAll(demoCertificates);
+    distributionRepository.saveDeliveries(demoDeliveries);
+    demoCampaigns.forEach((c) => distributionRepository.saveCampaign(c));
+    demoAuditLogs.forEach((l) => distributionRepository.addAuditLog(l));
+    demoNotifications.forEach((n) => distributionRepository.addNotification(n));
   }
 }
 
@@ -205,4 +463,8 @@ export function resetDemoData(): void {
   eventRepository.saveAll(demoEvents);
   recipientRepository.saveAll(demoRecipients);
   certificateRepository.saveAll(demoCertificates);
+  distributionRepository.saveDeliveries(demoDeliveries);
+  demoCampaigns.forEach((c) => distributionRepository.saveCampaign(c));
+  demoAuditLogs.forEach((l) => distributionRepository.addAuditLog(l));
+  demoNotifications.forEach((n) => distributionRepository.addNotification(n));
 }
