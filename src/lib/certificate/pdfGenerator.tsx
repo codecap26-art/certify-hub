@@ -310,6 +310,35 @@ export async function generateSingleCertificatePdfBlob(
   return await instance.toBlob();
 }
 
+export async function generateSingleCertificatePdfBuffer(
+  certificate: CertificateRecord,
+  origin: string = 'https://certifyhub.com'
+): Promise<Buffer> {
+  const currentOrg = certificate.organizationSnapshot || organizationRepository.get();
+  const certToRender: CertificateRecord = {
+    ...certificate,
+    organizationSnapshot: {
+      ...currentOrg,
+      ...certificate.organizationSnapshot,
+      logoDataUrl: certificate.organizationSnapshot?.logoDataUrl || currentOrg.logoDataUrl,
+      signatureDataUrl: certificate.organizationSnapshot?.signatureDataUrl || currentOrg.signatureDataUrl,
+    },
+  };
+
+  let qrDataUrl = '';
+  try {
+    const verifyUrl = `${origin}/verify/${certificate.verificationToken || certificate.certificateCode}`;
+    qrDataUrl = await QRCode.toDataURL(verifyUrl, { margin: 1, width: 200 });
+  } catch (err) {
+    // QRCode generation fallback
+  }
+
+  const instance = pdf(<CertificatePdfDocument certificate={certToRender} qrDataUrl={qrDataUrl} />);
+  const blob = await instance.toBlob();
+  const arrayBuffer = await blob.arrayBuffer();
+  return Buffer.from(arrayBuffer);
+}
+
 export async function downloadCertificatePdf(certificate: CertificateRecord): Promise<void> {
   if (typeof window === 'undefined') return;
 

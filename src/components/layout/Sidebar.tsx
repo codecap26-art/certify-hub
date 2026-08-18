@@ -16,6 +16,8 @@ import {
   PlusCircle,
   ChevronLeft,
   ChevronRight,
+  Send,
+  Award,
   LucideIcon,
 } from 'lucide-react';
 import { sessionRepository } from '@/lib/storage/sessionRepository';
@@ -43,6 +45,13 @@ export const navigationSections: NavSection[] = [
     items: [
       { name: 'Events', href: '/events', icon: Calendar },
       { name: 'Recipients', href: '/recipients', icon: Users },
+      { name: 'Recipient Portal', href: '/portal', icon: Award },
+    ],
+  },
+  {
+    title: 'DISTRIBUTION',
+    items: [
+      { name: 'Certificate Distribution', href: '/distribution', icon: Send },
     ],
   },
   {

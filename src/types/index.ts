@@ -101,6 +101,12 @@ export interface CertificateRecord {
   id: string;
   certificateCode: string;
   verificationToken: string;
+  downloadToken?: string;
+  downloadCount?: number;
+  firstDownloadedAt?: string;
+  lastDownloadedAt?: string;
+  expiresAt?: string;
+  isActive?: boolean;
   eventId: string;
   recipientId: string;
   templateId: TemplateId | string;
@@ -138,3 +144,5 @@ export interface SessionState {
   email: string;
   loginAt: string;
 }
+
+export * from './distribution';
