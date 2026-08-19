@@ -13,6 +13,7 @@ export interface EmailPayload {
   html: string;
   text?: string;
   attachments?: EmailAttachment[];
+  certificate?: any;
   tags?: { name: string; value: string }[];
   metadata?: Record<string, string>;
 }

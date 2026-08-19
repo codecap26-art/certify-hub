@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { certificateRepository } from '@/lib/storage/certificateRepository';
 import { generateSafeAttachmentFilename } from '@/lib/email/templateEngine';
+import { generateSingleCertificatePdfBuffer } from '@/lib/certificate/pdfGenerator';
 
 export async function GET(
   req: NextRequest,
@@ -49,6 +50,27 @@ export async function GET(
     cert.recipientSnapshot.fullName,
     cert.eventSnapshot.name
   );
+
+  const shouldStreamPdf =
+    req.nextUrl.searchParams.get('download') === 'true' ||
+    req.headers.get('accept')?.includes('application/pdf');
+
+  if (shouldStreamPdf) {
+    try {
+      const pdfBuffer = await generateSingleCertificatePdfBuffer(cert, req.nextUrl.origin);
+      const uint8Array = new Uint8Array(pdfBuffer);
+      return new NextResponse(uint8Array, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': `attachment; filename="${safeFilename}"`,
+          'Content-Length': String(pdfBuffer.length),
+        },
+      });
+    } catch (genErr) {
+      console.error('API PDF Generation error:', genErr);
+    }
+  }
 
   return NextResponse.json({
     success: true,

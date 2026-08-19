@@ -19,6 +19,7 @@ import {
   Edit3,
   ExternalLink,
   Palette,
+  Mail,
 } from 'lucide-react';
 import { eventRepository } from '@/lib/storage/eventRepository';
 import { recipientRepository } from '@/lib/storage/recipientRepository';
@@ -859,13 +860,21 @@ export default function CertificateGeneratorWizard() {
               )}
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                <Link
+                  href={`/distribution/new?eventId=${selectedEvent?.id}`}
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-8 rounded-lg shadow-sm transition text-sm"
+                >
+                  <Mail className="w-4 h-4" />
+                  <span>Email Certificates to All Recipients (PDF Attached)</span>
+                </Link>
+
                 <button
                   onClick={handleDownloadZip}
                   disabled={isGenerating}
                   className="w-full sm:w-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-8 rounded-lg shadow-sm transition text-sm disabled:opacity-50"
                 >
                   <Download className="w-4 h-4" />
-                  <span>Download Bulk ZIP Bundle</span>
+                  <span>Download Bulk ZIP</span>
                 </button>
 
                 <Link
@@ -873,7 +882,7 @@ export default function CertificateGeneratorWizard() {
                   className="w-full sm:w-auto flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3.5 px-8 rounded-lg border border-slate-200 text-sm"
                 >
                   <FileCheck className="w-4 h-4 text-amber-600" />
-                  <span>View Audit History</span>
+                  <span>Audit History</span>
                 </Link>
               </div>
             </div>

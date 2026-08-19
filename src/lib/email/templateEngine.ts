@@ -159,6 +159,13 @@ export function renderFullHtmlEmail(
     <div class="content">
       ${bodyHtml}
 
+      <!-- Action Button -->
+      <div class="btn-container">
+        <a href="${ctaLink}" target="_blank" class="btn">
+          ${ctaText || 'View & Download Certificate'}
+        </a>
+      </div>
+
       <!-- Direct PDF Attachment Notice Card -->
       <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 12px; padding: 18px 20px; margin: 24px 0; text-align: center;">
         <p style="margin: 0; font-size: 15px; font-weight: 700; color: #166534;">
@@ -168,6 +175,13 @@ export function renderFullHtmlEmail(
           Open the attached certificate in Gmail / Chrome to preview or download it directly to your device.
         </p>
       </div>
+
+      ${verifyUrl ? `
+      <div style="text-align: center; margin-top: 14px;">
+        <a href="${verifyUrl}" target="_blank" style="color: #2563eb; font-size: 12px; text-decoration: underline;">
+          🔍 Or click here to verify credential authenticity online
+        </a>
+      </div>` : ''}
     </div>
 
     <!-- Footer -->

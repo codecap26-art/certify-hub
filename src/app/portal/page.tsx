@@ -24,12 +24,12 @@ import { organizationRepository } from '@/lib/storage/organizationRepository';
 import { CertificateRecord, Recipient, Organization } from '@/types';
 import { RecipientNotification } from '@/types/distribution';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { downloadCertificatePdf } from '@/lib/certificate/pdfGenerator';
+import { downloadCertificatePdf, viewCertificatePdfInTab } from '@/lib/certificate/pdfGenerator';
 import { CertificateRenderer } from '@/components/templates/CertificateRenderer';
 
 export default function RecipientPortalPage() {
-  const [lookupQuery, setLookupQuery] = useState('subash@example.com');
-  const [activeQuery, setActiveQuery] = useState('subash@example.com');
+  const [lookupQuery, setLookupQuery] = useState('');
+  const [activeQuery, setActiveQuery] = useState('');
   const [certificates, setCertificates] = useState<CertificateRecord[]>([]);
   const [notifications, setNotifications] = useState<RecipientNotification[]>([]);
   const [previewCert, setPreviewCert] = useState<CertificateRecord | null>(null);
@@ -39,6 +39,11 @@ export default function RecipientPortalPage() {
   const handleSearch = (query: string) => {
     setActiveQuery(query);
     const clean = query.trim().toLowerCase();
+    if (!clean) {
+      setCertificates([]);
+      setNotifications([]);
+      return;
+    }
 
     // 1. Find all matching recipients by email or roll no
     const allRecipients = recipientRepository.getAll();
@@ -58,7 +63,6 @@ export default function RecipientPortalPage() {
         (c.recipientSnapshot.email && c.recipientSnapshot.email.toLowerCase() === clean) ||
         (c.recipientSnapshot.registrationNumber && c.recipientSnapshot.registrationNumber.toLowerCase() === clean)
     );
-
     setCertificates(matchedCerts);
 
     // 3. Fetch recipient notifications
@@ -73,10 +77,8 @@ export default function RecipientPortalPage() {
       if (emailParam) {
         setLookupQuery(emailParam);
         handleSearch(emailParam);
-        return;
       }
     }
-    handleSearch('subash@example.com');
   }, []);
 
   const handleDownload = async (cert: CertificateRecord) => {

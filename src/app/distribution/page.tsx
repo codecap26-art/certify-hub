@@ -18,6 +18,10 @@ import {
   Calendar,
   Users,
   Building2,
+  Mail,
+  ShieldCheck,
+  Sparkles,
+  Info,
 } from 'lucide-react';
 import { distributionRepository } from '@/lib/storage/distributionRepository';
 import { eventRepository } from '@/lib/storage/eventRepository';
@@ -29,6 +33,85 @@ export default function DistributionOverviewPage() {
   const [campaigns, setCampaigns] = useState<DistributionCampaign[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [smtpStatus, setSmtpStatus] = useState<{ configured: boolean; user?: string; message?: string } | null>(null);
+  const [isCheckingSmtp, setIsCheckingSmtp] = useState(true);
+  const [smtpUserInput, setSmtpUserInput] = useState('');
+  const [smtpPassInput, setSmtpPassInput] = useState('');
+  const [isSavingSmtp, setIsSavingSmtp] = useState(false);
+  const [testEmailAddress, setTestEmailAddress] = useState('');
+  const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [showTestModal, setShowTestModal] = useState(false);
+
+  const checkSmtp = async () => {
+    try {
+      setIsCheckingSmtp(true);
+      const res = await fetch('/api/email/verify-smtp');
+      const data = await res.json();
+      setSmtpStatus(data);
+      if (data.user && data.user !== 'Not set') {
+        setSmtpUserInput(data.user);
+      }
+    } catch {
+      setSmtpStatus({ configured: false, message: 'Could not connect to SMTP verification endpoint' });
+    } finally {
+      setIsCheckingSmtp(false);
+    }
+  };
+
+  const handleSaveSmtp = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!smtpUserInput.trim() || !smtpPassInput.trim()) {
+      setSaveSmtpResult({ success: false, message: 'Please provide both your Gmail address and Google App Password.' });
+      return;
+    }
+
+    try {
+      setIsSavingSmtp(true);
+      setSaveSmtpResult(null);
+      const res = await fetch('/api/email/configure-smtp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          smtpUser: smtpUserInput.trim(),
+          smtpPass: smtpPassInput.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSaveSmtpResult({ success: true, message: `✓ ${data.message}` });
+        await checkSmtp();
+      } else {
+        setSaveSmtpResult({ success: false, message: data.error || 'Failed to authenticate with Gmail' });
+      }
+    } catch (err: any) {
+      setSaveSmtpResult({ success: false, message: err?.message || 'Network error saving SMTP credentials' });
+    } finally {
+      setIsSavingSmtp(false);
+    }
+  };
+
+  const handleSendTestEmail = async () => {
+    if (!testEmailAddress.trim()) return;
+    try {
+      setIsSendingTest(true);
+      setTestResult(null);
+      const res = await fetch('/api/email/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipientEmail: testEmailAddress.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setTestResult({ success: true, message: `✓ Test email sent successfully to ${testEmailAddress}!` });
+      } else {
+        setTestResult({ success: false, message: data.error || 'Failed to send test email' });
+      }
+    } catch (err: any) {
+      setTestResult({ success: false, message: err?.message || 'Network error sending test email' });
+    } finally {
+      setIsSendingTest(false);
+    }
+  };
 
   const loadData = () => {
     // Check scheduled campaigns
@@ -39,6 +122,7 @@ export default function DistributionOverviewPage() {
 
   useEffect(() => {
     loadData();
+    checkSmtp();
     const interval = setInterval(loadData, 3000);
     return () => clearInterval(interval);
   }, []);
@@ -69,6 +153,20 @@ export default function DistributionOverviewPage() {
         breadcrumbs={[{ label: 'Certificate Distribution' }]}
         action={
           <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setShowTestModal(true)}
+              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+              style={{
+                backgroundColor: 'var(--surface)',
+                borderColor: 'var(--border)',
+                color: 'var(--text-secondary)',
+              }}
+            >
+              <Mail className="w-4 h-4 text-emerald-600" />
+              <span>Send Test Email</span>
+            </button>
+
             <Link
               href="/portal"
               className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition"
@@ -95,6 +193,67 @@ export default function DistributionOverviewPage() {
           </div>
         }
       />
+
+      {/* SMTP Configuration Status Card */}
+      {!isCheckingSmtp && (
+        <div
+          className={`p-4 sm:p-5 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition shadow-xs ${
+            smtpStatus?.configured
+              ? 'bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-100'
+              : 'bg-amber-50/90 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100'
+          }`}
+        >
+          <div className="flex items-start sm:items-center gap-3.5">
+            <div
+              className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                smtpStatus?.configured
+                  ? 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300'
+                  : 'bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300'
+              }`}
+            >
+              {smtpStatus?.configured ? (
+                <ShieldCheck className="w-5 h-5" />
+              ) : (
+                <AlertTriangle className="w-5 h-5" />
+              )}
+            </div>
+            <div className="space-y-0.5">
+              <p className="text-xs font-bold flex items-center gap-2">
+                <span>{smtpStatus?.configured ? 'Gmail SMTP Server Connected & Active' : 'Gmail SMTP Not Configured'}</span>
+                {smtpStatus?.configured && (
+                  <span className="text-[10px] bg-emerald-200 dark:bg-emerald-800 text-emerald-800 dark:text-emerald-100 px-2 py-0.5 rounded-full font-mono">
+                    {smtpStatus.user}
+                  </span>
+                )}
+              </p>
+              <p className="text-[11px] opacity-80">
+                {smtpStatus?.configured
+                  ? 'Real emails with attached certificate PDFs will be delivered directly to students’ Gmail / inbox.'
+                  : 'To send real emails to recipient inboxes, configure your Gmail address and Google App Password below or in .env.local.'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => setShowTestModal(true)}
+              className="px-3.5 py-1.5 text-xs font-bold rounded-xl border bg-white dark:bg-slate-900 shadow-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+              style={{ borderColor: 'var(--border)' }}
+            >
+              {smtpStatus?.configured ? 'Send Test Email' : 'Setup & Test SMTP'}
+            </button>
+            <button
+              type="button"
+              onClick={checkSmtp}
+              className="p-1.5 rounded-xl border bg-white dark:bg-slate-900 shadow-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+              title="Refresh SMTP status"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Top 4 KPI Metric Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -375,6 +534,190 @@ export default function DistributionOverviewPage() {
           </div>
         )}
       </div>
+
+      {/* Send Test Email & Setup Modal */}
+      {showTestModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
+          <div
+            className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl border shadow-2xl p-6 sm:p-8 space-y-6"
+            style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}
+          >
+            <div className="flex items-center justify-between border-b pb-4" style={{ borderColor: 'var(--border-subtle)' }}>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center">
+                  <Mail className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-base" style={{ color: 'var(--text-primary)' }}>
+                    Gmail SMTP Live Email Setup
+                  </h3>
+                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                    Configure Google SMTP to send real certificate emails directly to students
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowTestModal(false);
+                  setTestResult(null);
+                  setSaveSmtpResult(null);
+                }}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs px-2.5 py-1.5 rounded-lg border"
+                style={{ borderColor: 'var(--border)' }}
+              >
+                Close
+              </button>
+            </div>
+
+            {/* Quick 3-Step Setup Guide */}
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
+              <p className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                <Info className="w-4 h-4 text-blue-600" />
+                <span>How to get your Google App Password (1 minute):</span>
+              </p>
+              <ol className="list-decimal list-inside space-y-1 text-slate-600 dark:text-slate-400 text-[11.5px] leading-relaxed">
+                <li>Turn ON 2-Step Verification in <a href="https://myaccount.google.com/security" target="_blank" className="text-blue-600 underline font-semibold">Google Account Security</a>.</li>
+                <li>Go to <a href="https://myaccount.google.com/apppasswords" target="_blank" className="text-blue-600 underline font-semibold">Google App Passwords</a>.</li>
+                <li>Generate a 16-character password for "Mail" (e.g. <code>abcd efgh ijkl mnop</code>).</li>
+                <li>Enter your Gmail and 16-character App Password below and click <strong>"Save & Connect"</strong>:</li>
+              </ol>
+            </div>
+
+            {/* In-App Credentials Form */}
+            <form onSubmit={handleSaveSmtp} className="p-4 rounded-2xl border space-y-4 bg-slate-50/50 dark:bg-slate-900/50" style={{ borderColor: 'var(--border)' }}>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                1. Enter Gmail Credentials
+              </h4>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400">
+                    Sender Gmail (SMTP_USER):
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={smtpUserInput}
+                    onChange={(e) => setSmtpUserInput(e.target.value)}
+                    placeholder="your-email@gmail.com"
+                    className="w-full px-3 py-2 rounded-xl border text-xs focus:outline-none"
+                    style={{
+                      backgroundColor: 'var(--surface-subtle)',
+                      borderColor: 'var(--border)',
+                      color: 'var(--text-primary)',
+                    }}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400">
+                    16-Char App Password (SMTP_PASS):
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    value={smtpPassInput}
+                    onChange={(e) => setSmtpPassInput(e.target.value)}
+                    placeholder="xxxx xxxx xxxx xxxx"
+                    className="w-full px-3 py-2 rounded-xl border text-xs focus:outline-none"
+                    style={{
+                      backgroundColor: 'var(--surface-subtle)',
+                      borderColor: 'var(--border)',
+                      color: 'var(--text-primary)',
+                    }}
+                  />
+                </div>
+              </div>
+
+              {saveSmtpResult && (
+                <div
+                  className={`p-3 rounded-xl border text-xs ${
+                    saveSmtpResult.success
+                      ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 text-emerald-800 dark:text-emerald-200 font-semibold'
+                      : 'bg-rose-50 dark:bg-rose-950/40 border-rose-300 text-rose-800 dark:text-rose-200'
+                  }`}
+                >
+                  {saveSmtpResult.message}
+                </div>
+              )}
+
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  disabled={isSavingSmtp || !smtpUserInput.trim() || !smtpPassInput.trim()}
+                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs shadow-xs transition"
+                >
+                  {isSavingSmtp ? 'Verifying with Google...' : 'Save & Connect Gmail SMTP'}
+                </button>
+              </div>
+            </form>
+
+            {/* Test Input & Sender */}
+            <div className="p-4 rounded-2xl border space-y-3" style={{ borderColor: 'var(--border)' }}>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                2. Send Test Email to Any Inbox
+              </h4>
+
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400">
+                  Recipient Destination Email (TO):
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    value={testEmailAddress}
+                    onChange={(e) => setTestEmailAddress(e.target.value)}
+                    placeholder="e.g. abineshk2007@gmail.com"
+                    className="flex-1 px-3.5 py-2.5 rounded-xl border text-xs focus:outline-none"
+                    style={{
+                      backgroundColor: 'var(--surface-subtle)',
+                      borderColor: 'var(--border)',
+                      color: 'var(--text-primary)',
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSendTestEmail}
+                    disabled={isSendingTest || !testEmailAddress.trim()}
+                    className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-xs shadow-xs transition shrink-0"
+                  >
+                    {isSendingTest ? 'Sending...' : 'Send Live Test'}
+                  </button>
+                </div>
+              </div>
+
+              {testResult && (
+                <div
+                  className={`p-3 rounded-xl border text-xs mt-2 ${
+                    testResult.success
+                      ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 text-emerald-800 dark:text-emerald-200 font-semibold'
+                      : 'bg-rose-50 dark:bg-rose-950/40 border-rose-300 text-rose-800 dark:text-rose-200'
+                  }`}
+                >
+                  {testResult.message}
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowTestModal(false);
+                  setTestResult(null);
+                  setSaveSmtpResult(null);
+                }}
+                className="px-5 py-2.5 rounded-xl border text-xs font-semibold"
+                style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

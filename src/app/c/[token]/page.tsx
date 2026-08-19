@@ -18,11 +18,12 @@ import {
   Clock,
   ArrowRight,
   ExternalLink,
+  Eye,
 } from 'lucide-react';
 import { certificateRepository } from '@/lib/storage/certificateRepository';
 import { CertificateRecord } from '@/types';
 import { CertificateRenderer } from '@/components/templates/CertificateRenderer';
-import { downloadCertificatePdf } from '@/lib/certificate/pdfGenerator';
+import { downloadCertificatePdf, viewCertificatePdfInTab } from '@/lib/certificate/pdfGenerator';
 import { motion } from 'framer-motion';
 
 export default function RecipientCertificatePage({ params }: { params: Promise<{ token: string }> }) {
@@ -42,14 +43,17 @@ export default function RecipientCertificatePage({ params }: { params: Promise<{
     setCertificate(cert || null);
     setLoading(false);
 
-    // Auto-trigger direct Chrome browser download on arrival (Step: direct Chrome download without clicking around)
+    // Auto-trigger direct browser download on arrival if download=true query or initial visit
     if (cert && cert.status !== 'Revoked' && typeof window !== 'undefined') {
       const isExpired = cert.expiresAt && new Date(cert.expiresAt).getTime() < Date.now();
       if (!isExpired) {
-        // Automatically initiate browser download directly to Chrome download bar
-        setTimeout(() => {
-          handleDownload(cert);
-        }, 150);
+        const urlParams = new URLSearchParams(window.location.search);
+        const shouldAutoDownload = urlParams.get('download') === 'true';
+        if (shouldAutoDownload) {
+          setTimeout(() => {
+            handleDownload(cert);
+          }, 300);
+        }
       }
     }
   }, [resolvedParams.token]);
@@ -65,7 +69,7 @@ export default function RecipientCertificatePage({ params }: { params: Promise<{
       // Record download activity tracking
       certificateRepository.recordDownload(targetCert.id);
 
-      // Trigger direct Chrome download
+      // Trigger direct Chrome/browser download
       await downloadCertificatePdf(targetCert);
 
       setDownloadSuccess(true);
@@ -76,6 +80,15 @@ export default function RecipientCertificatePage({ params }: { params: Promise<{
       console.error('Download error:', err);
     } finally {
       setIsDownloading(false);
+    }
+  };
+
+  const handleViewInTab = async () => {
+    if (!certificate || certificate.status === 'Revoked') return;
+    try {
+      await viewCertificatePdfInTab(certificate);
+    } catch (err) {
+      console.error('View PDF error:', err);
     }
   };
 
@@ -312,7 +325,7 @@ export default function RecipientCertificatePage({ params }: { params: Promise<{
 
           {/* Primary Action Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-            <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => handleDownload()}
@@ -330,6 +343,17 @@ export default function RecipientCertificatePage({ params }: { params: Promise<{
                     <span>Download Official PDF</span>
                   </>
                 )}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleViewInTab}
+                disabled={isRevoked}
+                className="flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold text-xs text-slate-700 dark:text-slate-300 transition"
+                title="Open PDF in Full Screen Tab"
+              >
+                <Eye className="w-4 h-4 text-blue-600" />
+                <span>Open PDF in Tab</span>
               </button>
 
               <button

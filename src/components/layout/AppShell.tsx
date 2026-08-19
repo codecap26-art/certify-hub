@@ -121,7 +121,7 @@ export const AppShell: React.FC<Props> = ({ children }) => {
                   <AlertTriangle className="w-4 h-4" />
                 </div>
                 <h3 className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>
-                  Reset Demo Data
+                  Clear All Data
                 </h3>
               </div>
               <button
@@ -144,8 +144,8 @@ export const AppShell: React.FC<Props> = ({ children }) => {
 
             {/* Modal Body */}
             <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-              Are you sure you want to reset all stored browser data? This will clear your custom
-              events, recipients, organization branding, and restore default demo records.
+              Are you sure you want to clear all stored browser data? This will remove all custom
+              events, recipients, campaigns, deliveries, and certificates, giving you a fresh workspace.
             </p>
 
             {/* Modal Footer */}
@@ -171,7 +171,7 @@ export const AppShell: React.FC<Props> = ({ children }) => {
                 onClick={handleConfirmReset}
                 className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white rounded-xl transition-all"
                 style={{
-                  backgroundColor: 'var(--warning)',
+                  backgroundColor: 'var(--danger, #EF4444)',
                   boxShadow: 'var(--shadow-sm)',
                 }}
                 onMouseEnter={(e) => {
@@ -182,7 +182,7 @@ export const AppShell: React.FC<Props> = ({ children }) => {
                 }}
               >
                 <RefreshCw className="w-3.5 h-3.5" />
-                <span>Confirm Reset</span>
+                <span>Confirm Clear</span>
               </button>
             </div>
           </div>

@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { CustomTemplate } from '@/types/template';
 import { templateRepository } from '@/lib/storage/templateRepository';
-import { demoRecipients } from '@/lib/demo-data';
+import { recipientRepository } from '@/lib/storage/recipientRepository';
 import { Recipient } from '@/types';
 import dynamic from 'next/dynamic';
 
@@ -29,12 +29,27 @@ interface Props {
   params: Promise<{ templateId: string }>;
 }
 
+const defaultPreviewRecipient: Recipient = {
+  id: 'preview-sample-01',
+  eventId: 'preview-evt',
+  fullName: 'Recipient Name',
+  email: 'student@example.com',
+  registrationNumber: 'REG-001',
+  department: 'Computer Science',
+  course: 'Certification Course',
+  achievement: 'Excellence Award',
+  category: 'participant',
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+};
+
 export default function StudioPreviewPage({ params }: Props) {
   const { templateId } = use(params);
   const router = useRouter();
 
   const [template, setTemplate] = useState<CustomTemplate | null>(null);
-  const [selectedRecipient, setSelectedRecipient] = useState<Recipient>(demoRecipients[0]);
+  const [recipientsList, setRecipientsList] = useState<Recipient[]>([defaultPreviewRecipient]);
+  const [selectedRecipient, setSelectedRecipient] = useState<Recipient>(defaultPreviewRecipient);
   const [zoomLevel, setZoomLevel] = useState(0.85);
 
   useEffect(() => {
@@ -47,6 +62,12 @@ export default function StudioPreviewPage({ params }: Props) {
       }
     }
     fetchTmpl();
+
+    const storedRecipients = recipientRepository.getAll();
+    if (storedRecipients.length > 0) {
+      setRecipientsList(storedRecipients);
+      setSelectedRecipient(storedRecipients[0]);
+    }
   }, [templateId, router]);
 
   if (!template) {
@@ -103,14 +124,14 @@ export default function StudioPreviewPage({ params }: Props) {
             <select
               value={selectedRecipient.id}
               onChange={(e) => {
-                const rec = demoRecipients.find((r) => r.id === e.target.value);
+                const rec = recipientsList.find((r) => r.id === e.target.value);
                 if (rec) setSelectedRecipient(rec);
               }}
               className="bg-transparent text-xs font-semibold text-slate-800 focus:outline-none"
             >
-              {demoRecipients.map((rec) => (
+              {recipientsList.map((rec) => (
                 <option key={rec.id} value={rec.id}>
-                  Sample Recipient: {rec.fullName} ({rec.registrationNumber})
+                  {rec.fullName} {rec.registrationNumber ? `(${rec.registrationNumber})` : ''}
                 </option>
               ))}
             </select>

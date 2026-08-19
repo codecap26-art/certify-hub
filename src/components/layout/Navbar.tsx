@@ -132,20 +132,20 @@ export const Navbar: React.FC<Props> = ({ onToggleMobileMenu, onResetDemoData })
               onClick={onResetDemoData}
               className="hidden sm:flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors"
               style={{
-                color: 'var(--warning-text)',
-                backgroundColor: 'var(--warning-light)',
-                borderColor: 'var(--warning-border)',
+                color: 'var(--text-secondary)',
+                backgroundColor: 'var(--surface-subtle)',
+                borderColor: 'var(--border)',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--warning-border)';
+                e.currentTarget.style.backgroundColor = 'var(--border)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--warning-light)';
+                e.currentTarget.style.backgroundColor = 'var(--surface-subtle)';
               }}
-              title="Reset all browser storage data to initial demo state"
+              title="Clear all stored data and reset workspace"
             >
               <RefreshCw className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Reset Data</span>
+              <span className="hidden sm:inline">Clear Data</span>
             </button>
           )}
 

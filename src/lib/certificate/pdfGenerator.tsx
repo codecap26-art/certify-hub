@@ -314,6 +314,13 @@ export async function generateSingleCertificatePdfBuffer(
   certificate: CertificateRecord,
   origin: string = 'https://certifyhub.com'
 ): Promise<Buffer> {
+  // Check if certificate uses a custom template from templateRepository
+  const customTemplate = await templateRepository.getById(certificate.templateId);
+  if (customTemplate) {
+    const customPdfBytes = await generatePdfFromCustomTemplate(certificate, customTemplate);
+    return Buffer.from(customPdfBytes);
+  }
+
   const currentOrg = certificate.organizationSnapshot || organizationRepository.get();
   const certToRender: CertificateRecord = {
     ...certificate,
@@ -339,17 +346,42 @@ export async function generateSingleCertificatePdfBuffer(
   return Buffer.from(arrayBuffer);
 }
 
+export async function generateCertificatePdfBase64(
+  certificate: CertificateRecord,
+  origin: string = 'https://certifyhub.com'
+): Promise<string> {
+  const buffer = await generateSingleCertificatePdfBuffer(certificate, origin);
+  return buffer.toString('base64');
+}
+
 export async function downloadCertificatePdf(certificate: CertificateRecord): Promise<void> {
   if (typeof window === 'undefined') return;
 
   const blob = await generateSingleCertificatePdfBlob(certificate, window.location.origin);
-  const safeName = generateSafeFilename(certificate.recipientSnapshot.fullName, certificate.eventSnapshot.name);
+  const safeName = generateSafeFilename(certificate.recipientSnapshot?.fullName || 'Certificate', certificate.eventSnapshot?.name || 'Event');
 
+  const blobUrl = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
+  link.href = blobUrl;
   link.download = safeName;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  URL.revokeObjectURL(link.href);
+
+  // Delay revoking URL so browser has time to finish reading the stream
+  setTimeout(() => {
+    URL.revokeObjectURL(blobUrl);
+  }, 10000);
+}
+
+export async function viewCertificatePdfInTab(certificate: CertificateRecord): Promise<void> {
+  if (typeof window === 'undefined') return;
+
+  const blob = await generateSingleCertificatePdfBlob(certificate, window.location.origin);
+  const blobUrl = URL.createObjectURL(blob);
+  window.open(blobUrl, '_blank');
+
+  setTimeout(() => {
+    URL.revokeObjectURL(blobUrl);
+  }, 30000);
 }

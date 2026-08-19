@@ -20,20 +20,29 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: `Gmail SMTP is not configured. Missing: ${config.missingFields.join(', ')}`,
+          error: `Gmail SMTP is not configured. Missing: ${config.missingFields.join(', ')}. Please configure SMTP in Distribution page or .env.local.`,
           errorCategory: 'CONFIGURATION_ERROR',
-          isConfigured: false,
         },
-        { status: 503 }
+        { status: 400 }
       );
     }
 
     let attachments = body.attachments || [];
 
-    // If a full certificate object is provided and attachment buffer is missing, generate it server-side
-    if (body.certificate && (!attachments.length || !attachments[0]?.content)) {
+    // Normalize incoming attachments or generate server-side if certificate object is provided
+    if (attachments.length > 0 && attachments[0]?.content && typeof attachments[0].content === 'string' && attachments[0].content.trim() !== '') {
+      const cleanBase64 = attachments[0].content.replace(/^data:[^;]+;base64,/, '');
+      attachments = [
+        {
+          filename: attachments[0].filename || 'Certificate.pdf',
+          content: Buffer.from(cleanBase64, 'base64'),
+          contentType: 'application/pdf',
+        },
+      ];
+    } else if (body.certificate) {
       try {
-        const pdfBuffer = await generateSingleCertificatePdfBuffer(body.certificate);
+        const origin = req.nextUrl?.origin || 'http://localhost:3000';
+        const pdfBuffer = await generateSingleCertificatePdfBuffer(body.certificate, origin);
         const safeFilename = generateSafeAttachmentFilename(
           body.certificate.recipientSnapshot?.fullName || 'Recipient',
           body.certificate.eventSnapshot?.name || 'Certificate'
@@ -46,7 +55,7 @@ export async function POST(req: NextRequest) {
           },
         ];
       } catch (genErr: any) {
-        console.error('Server PDF Generation Error:', genErr);
+        console.error('Server PDF Generation Error in send route:', genErr);
       }
     }
 

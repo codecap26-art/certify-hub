@@ -53,6 +53,7 @@ export class ServerSmtpProvider implements EmailProvider {
           replyTo: payload.replyTo,
           subject: payload.subject,
           html: payload.html,
+          certificate: payload.certificate,
           attachments: payload.attachments?.map((a) => ({
             filename: a.filename,
             content: typeof a.content === 'string' ? a.content : undefined,
@@ -72,12 +73,6 @@ export class ServerSmtpProvider implements EmailProvider {
         };
       }
 
-      // If SMTP is not yet configured in .env.local, fall back to mock provider for local demo development
-      if (response.status === 503 || data.errorCategory === 'CONFIGURATION_ERROR') {
-        console.warn('[SMTP Notice] Gmail SMTP not configured in .env.local. Simulating transactional delivery.');
-        return this.fallbackMock.sendEmail(payload);
-      }
-
       return {
         success: false,
         error: data.error || 'Failed to send email via SMTP server',
@@ -85,8 +80,12 @@ export class ServerSmtpProvider implements EmailProvider {
         timestamp: new Date().toISOString(),
       };
     } catch (err: any) {
-      console.warn('[SMTP Network Notice] Could not reach SMTP endpoint. Using local transactional queue:', err?.message);
-      return this.fallbackMock.sendEmail(payload);
+      return {
+        success: false,
+        error: `Could not reach SMTP service: ${err?.message || 'Network error'}`,
+        errorCategory: 'PROVIDER_REJECTED',
+        timestamp: new Date().toISOString(),
+      };
     }
   }
 

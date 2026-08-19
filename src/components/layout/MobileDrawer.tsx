@@ -171,7 +171,7 @@ export const MobileDrawer: React.FC<Props> = ({ isOpen, onClose, onResetDemoData
                 }}
               >
                 <RefreshCw className="w-3.5 h-3.5" />
-                <span>Reset Demo Data</span>
+                <span>Clear Data</span>
               </button>
 
               <button

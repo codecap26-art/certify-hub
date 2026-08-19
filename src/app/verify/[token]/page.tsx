@@ -11,13 +11,14 @@ import {
   User,
   ArrowLeft,
   Download,
+  Eye,
   FileCheck,
 } from 'lucide-react';
 import { certificateRepository } from '@/lib/storage/certificateRepository';
 import { CertificateRecord } from '@/types';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { CertificateRenderer } from '@/components/templates/CertificateRenderer';
-import { downloadCertificatePdf } from '@/lib/certificate/pdfGenerator';
+import { downloadCertificatePdf, viewCertificatePdfInTab } from '@/lib/certificate/pdfGenerator';
 import { motion } from 'framer-motion';
 
 export default function VerificationResultPage({ params }: { params: Promise<{ token: string }> }) {
@@ -79,6 +80,10 @@ export default function VerificationResultPage({ params }: { params: Promise<{ t
     setIsDownloading(true);
     await downloadCertificatePdf(certificate);
     setIsDownloading(false);
+  };
+
+  const handleViewInTab = async () => {
+    await viewCertificatePdfInTab(certificate);
   };
 
   return (
@@ -185,21 +190,36 @@ export default function VerificationResultPage({ params }: { params: Promise<{ t
           borderColor: 'var(--border)',
         }}
       >
-        <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: 'var(--border-subtle)' }}>
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-3" style={{ borderColor: 'var(--border-subtle)' }}>
           <span className="text-xs font-bold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
             <FileCheck className="w-4 h-4" style={{ color: 'var(--primary)' }} />
             <span>Authenticated Certificate Document</span>
           </span>
 
-          <button
-            onClick={handleDownload}
-            disabled={isDownloading}
-            className="flex items-center gap-1.5 text-white text-xs font-bold py-2 px-4 rounded-lg shadow-xs transition"
-            style={{ backgroundColor: 'var(--primary)' }}
-          >
-            <Download className="w-4 h-4" />
-            <span>{isDownloading ? 'Downloading...' : 'Download Official PDF'}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleViewInTab}
+              className="flex items-center gap-1.5 text-xs font-semibold py-2 px-3.5 rounded-lg border transition hover:bg-slate-50 dark:hover:bg-slate-800"
+              style={{
+                borderColor: 'var(--border)',
+                color: 'var(--text-primary)',
+              }}
+              title="Open PDF in Full Screen Tab"
+            >
+              <Eye className="w-4 h-4 text-blue-600" />
+              <span>Open PDF</span>
+            </button>
+
+            <button
+              onClick={handleDownload}
+              disabled={isDownloading}
+              className="flex items-center gap-1.5 text-white text-xs font-bold py-2 px-4 rounded-lg shadow-xs transition hover:brightness-105"
+              style={{ backgroundColor: 'var(--primary)' }}
+            >
+              <Download className="w-4 h-4" />
+              <span>{isDownloading ? 'Downloading...' : 'Download Official PDF'}</span>
+            </button>
+          </div>
         </div>
 
         <div

@@ -1,4 +1,18 @@
-import nodemailer, { Transporter } from 'nodemailer';
+// Dynamic and safe import of nodemailer for Next.js server runtime
+let nodemailerInstance: any = null;
+
+function getNodemailer() {
+  if (nodemailerInstance) return nodemailerInstance;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    nodemailerInstance = require('nodemailer');
+    return nodemailerInstance;
+  } catch {
+    return null;
+  }
+}
+
+export type Transporter = any;
 
 export interface SmtpConfigStatus {
   isConfigured: boolean;
@@ -73,12 +87,19 @@ export function createSmtpTransporter(): { transporter?: Transporter; error?: st
     };
   }
 
+  const nm = getNodemailer();
+  if (!nm) {
+    return {
+      error: 'nodemailer module could not be loaded. Please ensure npm install has completed.',
+    };
+  }
+
   const rawPass = process.env.SMTP_PASS || '';
   const normalizedPass = rawPass.replace(/\s+/g, '');
 
   const isSecure = status.port === 465;
 
-  const transporter = nodemailer.createTransport({
+  const transporter = nm.createTransport({
     host: status.host,
     port: status.port,
     secure: isSecure, // true for 465, false for 587

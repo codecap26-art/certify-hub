@@ -18,8 +18,10 @@ import { Recipient, EventItem, Organization, CertificateRecord } from '@/types';
 import {
   renderFullHtmlEmail,
   replaceVariables,
+  generateSafeAttachmentFilename,
   TemplateContext,
 } from '@/lib/email/templateEngine';
+import { generateCertificatePdfBase64 } from '@/lib/certificate/pdfGenerator';
 import { defaultSmtpProvider } from '@/lib/email/providers/ServerSmtpProvider';
 
 interface Props {
@@ -113,17 +115,45 @@ export const EmailPreviewModal: React.FC<Props> = ({
       ${renderFullHtmlEmail(config, testContext)}
     `;
 
+    let pdfBase64 = '';
+    const safeFilename = generateSafeAttachmentFilename(
+      currentRecipient.fullName || 'Preview',
+      event.name || 'Certificate'
+    );
+
+    try {
+      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://certifyhub.edu';
+      pdfBase64 = await generateCertificatePdfBase64(matchingCert as CertificateRecord, origin);
+    } catch (pdfErr) {
+      console.warn('Failed to generate preview PDF attachment for test email:', pdfErr);
+    }
+
     const res = await defaultSmtpProvider.sendEmail({
       to: testEmailInput,
       from: config.fromName || organization.email,
       replyTo: config.replyTo || organization.email,
       subject: testSubject,
       html: testHtml,
+      certificate: matchingCert as CertificateRecord,
+      attachments: pdfBase64
+        ? [
+            {
+              filename: safeFilename,
+              content: pdfBase64,
+              contentType: 'application/pdf',
+            },
+          ]
+        : undefined,
+      metadata: {
+        recipientId: currentRecipient.id,
+        recipientName: currentRecipient.fullName,
+        certificateId: (matchingCert as CertificateRecord).id,
+      },
     });
 
     setIsSendingTest(false);
     if (res.success) {
-      setTestSentMessage(`Test email successfully delivered to ${testEmailInput}!`);
+      setTestSentMessage(`Test email with attached certificate PDF successfully delivered to ${testEmailInput}!`);
       setTimeout(() => setTestSentMessage(null), 5000);
     } else {
       setTestSentMessage(`Failed to send test email: ${res.error}`);

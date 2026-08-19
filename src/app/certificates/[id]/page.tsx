@@ -14,6 +14,7 @@ import {
   ArrowLeft,
   ExternalLink,
   X,
+  Mail,
 } from 'lucide-react';
 import { certificateRepository } from '@/lib/storage/certificateRepository';
 import { CertificateRecord } from '@/types';
@@ -21,6 +22,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { CertificateRenderer } from '@/components/templates/CertificateRenderer';
 import { downloadCertificatePdf } from '@/lib/certificate/pdfGenerator';
+import { SendSingleCertificateModal } from '@/components/distribution/SendSingleCertificateModal';
 
 export default function CertificateDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -29,6 +31,7 @@ export default function CertificateDetailPage({ params }: { params: Promise<{ id
   const [zoomLevel, setZoomLevel] = useState<number>(100);
   const [copiedLink, setCopiedLink] = useState(false);
   const [showRevokeModal, setShowRevokeModal] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
   const [revokeReason, setRevokeReason] = useState('');
   const [isDownloading, setIsDownloading] = useState(false);
 
@@ -167,12 +170,24 @@ export default function CertificateDetailPage({ params }: { params: Promise<{ id
           </Link>
 
           <button
+            onClick={() => setShowEmailModal(true)}
+            className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-4 rounded-lg shadow-xs transition"
+          >
+            <Mail className="w-4 h-4" />
+            <span>Email Certificate (PDF Attached)</span>
+          </button>
+
+          <button
             onClick={handleDownload}
             disabled={isDownloading}
-            className="flex items-center gap-1.5 text-white text-xs font-bold py-2 px-4 rounded-lg shadow-xs transition"
-            style={{ backgroundColor: 'var(--primary)' }}
+            className="flex items-center gap-1.5 text-xs font-semibold py-2 px-3.5 rounded-lg border transition hover:bg-slate-50 dark:hover:bg-slate-800"
+            style={{
+              backgroundColor: 'var(--surface-subtle)',
+              borderColor: 'var(--border)',
+              color: 'var(--text-secondary)',
+            }}
           >
-            <Download className="w-4 h-4" />
+            <Download className="w-4 h-4 text-blue-600" />
             <span>{isDownloading ? 'Building PDF...' : 'Download PDF'}</span>
           </button>
 
@@ -274,6 +289,16 @@ export default function CertificateDetailPage({ params }: { params: Promise<{ id
             </div>
           </div>
         </div>
+      )}
+
+      {/* Email Certificate Modal */}
+      {showEmailModal && (
+        <SendSingleCertificateModal
+          isOpen={showEmailModal}
+          onClose={() => setShowEmailModal(false)}
+          certificate={certificate}
+          onSuccess={() => setShowEmailModal(false)}
+        />
       )}
     </div>
   );

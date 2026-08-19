@@ -18,6 +18,7 @@ import {
   generateSafeAttachmentFilename,
   TemplateContext,
 } from '../templateEngine';
+import { generateCertificatePdfBase64 } from '@/lib/certificate/pdfGenerator';
 
 export class EmailQueueEngine {
   private provider: EmailProvider;
@@ -425,18 +426,29 @@ Certificate ID: ${cert?.id || 'none'}`);
 
           const safeFilename = generateSafeAttachmentFilename(recipient.fullName, event.name);
 
-          // Call provider with targetRecipientEmail strictly as 'to' and PDF attachment
+          // Generate real high-resolution binary PDF for email attachment
+          let pdfBase64 = '';
+          if (cert) {
+            try {
+              pdfBase64 = await generateCertificatePdfBase64(cert, originUrl);
+            } catch (pdfErr) {
+              console.warn('[Queue Engine] PDF generation warning:', pdfErr);
+            }
+          }
+
+          // Call provider with targetRecipientEmail strictly as 'to' and valid PDF attachment
           const result = await this.provider.sendEmail({
             to: targetRecipientEmail,
             from: senderFrom,
             replyTo: replyToAddress,
             subject: renderedSubject,
             html: renderedHtml,
+            certificate: cert,
             attachments: cert
               ? [
                   {
                     filename: safeFilename,
-                    content: '',
+                    content: pdfBase64,
                     contentType: 'application/pdf',
                   },
                 ]
